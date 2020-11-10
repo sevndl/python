@@ -4,7 +4,6 @@ def compterE(phrase):
   for i in phrase:
     if i == 'e':
       cpt += 1;
-  print(cpt);
-  return 0;
+  return cpt;
 
 compterE("salut les potes");
