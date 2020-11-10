@@ -2,7 +2,7 @@ def inverser(phrase):
   return ''.join(reversed(phrase));
 
 def palindrome(phrase):
-  nouvellePhrase = ''.join(reversed(phrase));
+  nouvellePhrase = inverser(phrase);
   phrase = phrase.replace(' ', '');
   phrase = phrase.lower();
   nouvellePhrase = nouvellePhrase.replace(' ', '');
