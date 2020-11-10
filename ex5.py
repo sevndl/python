@@ -1,4 +1,4 @@
 def supprimerEspaces(phrase):
   return phrase.replace(' ', '');
 
-supprimerEspaces("salut les potes");
+print(supprimerEspaces("salut les potes"));

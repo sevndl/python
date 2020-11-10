@@ -5,11 +5,11 @@ def compteMots(phrase):
   for i in listeMots:
     cpt += 1;
     
-  print(cpt);
+  return cpt;
 
 def listeMots(phrase):
   listMots = phrase.split();
-  print(listMots);
+  return listMots;
 
-compteMots("salut les amis 34");
-listeMots("salut les amis 34");
+print(compteMots("salut les amis 34"));
+print(listeMots("salut les amis 34"));

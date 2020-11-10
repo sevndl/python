@@ -4,4 +4,4 @@ def contientE(phrase):
       return True;
   return False;
 
-contientE("salut les amis");
+print(contientE("salut les amis"));

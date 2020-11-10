@@ -1,4 +1,4 @@
 def intercaler(phrase):
   return '*'.join(phrase);
 
-intercaler("bonjour");
+print(intercaler("bonjour"));

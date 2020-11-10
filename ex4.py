@@ -6,4 +6,4 @@ def compterE(phrase):
       cpt += 1;
   return cpt;
 
-compterE("salut les potes");
+print(compterE("salut les potes"));

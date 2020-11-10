@@ -8,6 +8,6 @@ def palindrome(phrase):
   else:
     return False;
 
-inverser("bonjour");
-palindrome("bonjour");
-palindrome("radar");
+print(inverser("bonjour"));
+print(palindrome("bonjour"));
+print(palindrome("esope reste ici et se repose"));
