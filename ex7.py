@@ -1,12 +1,12 @@
 def inverser(phrase):
-  print(''.join(reversed(phrase)));
+  return ''.join(reversed(phrase));
 
 def palindrome(phrase):
   nouvellePhrase = ''.join(reversed(phrase));
   if nouvellePhrase == phrase:
-    print("true");
+    return True;
   else:
-    print("false");
+    return False;
 
 inverser("bonjour");
 palindrome("bonjour");
