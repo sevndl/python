@@ -3,6 +3,10 @@ def inverser(phrase):
 
 def palindrome(phrase):
   nouvellePhrase = ''.join(reversed(phrase));
+  phrase = phrase.replace(' ', '');
+  phrase = phrase.lower();
+  nouvellePhrase = nouvellePhrase.replace(' ', '');
+  nouvellePhrase = nouvellePhrase.lower();
   if nouvellePhrase == phrase:
     return True;
   else:
@@ -10,4 +14,4 @@ def palindrome(phrase):
 
 print(inverser("bonjour"));
 print(palindrome("bonjour"));
-print(palindrome("esope reste ici et se repose"));
+print(palindrome("Esope reste ici et se repose"));
