@@ -7,4 +7,9 @@ def compteMots(phrase):
     
   print(cpt);
 
-compteMots("salut les amis");
+def listeMots(phrase):
+  listMots = phrase.split();
+  print(listMots);
+
+compteMots("salut les amis 34");
+listeMots("salut les amis 34");
