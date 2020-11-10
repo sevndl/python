@@ -1,9 +1,7 @@
 def contientE(phrase):
-  for i in phrase:
-    if i == 'e':
-      print("La phrase contient au moins un 'e'");
-      return 1;
-  print("pas de 'e'");
-  return 0;
+  for c in phrase:
+    if c == 'e':
+      return True;
+  return False;
 
 contientE("salut les amis");
