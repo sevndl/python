@@ -1,11 +1,11 @@
 def minmax(liste):
-  min = liste[0]
-  max = liste[0]
+  minimum = liste[0]
+  maximum = liste[0]
   for valeur in liste:
-    if valeur < min:
-      min = valeur
-    if valeur > max:
-      max = valeur
-  return min, max
+    if valeur < minimum:
+      minimum = valeur
+    if valeur > maximum:
+      maximum = valeur
+  return minimum, maximum
 
 print (minmax([2, 5, 1, 7, 6]))
