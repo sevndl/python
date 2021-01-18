@@ -10,6 +10,6 @@ def calculer_luminosite(m):
   for x in m:
     for y in x:
       sum += y
-  return sum / (nbLignes(m) * nbColonnes(m))
+  return int(sum / (nbLignes(m) * nbColonnes(m)))
 
-print("La luminosité de la matrice est : ", calculer_luminosite([[1,2,3], [4,5,6], [7,8,9]]))
+print("La luminosité de la matrice est : ", calculer_luminosite([[0,0,100,50], [0,0,100,100], [20,35,50,75]]))
