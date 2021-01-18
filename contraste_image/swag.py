@@ -14,19 +14,18 @@ def ecrire_matrice(m):
       else:
         print(', ', end = '')
 
-# def initialiserMatrice(lignes, colonnes=0, valeur=0):
-#   if colonnes==0:
-#     # on a affaire à une matrice carrée lignes x lignes
-#     colonnes=lignes
-#   matrice= []
-#   for iLig in range(0,lignes):
-#     # ajouter (append) dans matrice une ligne avec colonnes valeurs
-#     uneLigne=[]
-#   for iCol in range(0,colonnes):
-#     uneLigne.append(valeur)
-#   matrice.append(uneLigne)
-#   return matrice
-
+def initialiserMatrice(lignes, colonnes, valeur):
+  if colonnes==0:
+    # on a affaire à une matrice carrée lignes x lignes
+    colonnes=lignes
+  matrice= []
+  for iLig in range(0,lignes):
+    # ajouter (append) dans matrice une ligne avec colonnes valeurs
+    uneLigne=[]
+  for iCol in range(0,colonnes):
+    uneLigne.append(valeur)
+  matrice.append(uneLigne)
+  return matrice
 
 def calculer_luminosite(m):
   sum = 0
