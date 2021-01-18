@@ -1,6 +1,5 @@
 def ecrire_matrice(m):
-  print("La matrice à traiter est : ")
-  print(m)
+  print("La matrice à traiter est : ", m)
   for x in m:
     print(x)
 
