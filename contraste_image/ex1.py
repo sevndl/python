@@ -1,16 +1,21 @@
+def nbLignes(M):
+  return len(M)
+
+def nbColonnes(M):
+  return len(M[0])
+
 def ecrire_matrice(m):
   print("La matrice à traiter est : ", m)
-  for x in m:
-    print(x)
+  for x in range(0,nbLignes(m)):
+    print('[', end = '')
+    for y in range(0,nbColonnes(m)):
+      print(m[x][y], end = '')
+      if y == nbColonnes(m) - 1:
+        print(']')
+      else:
+        print(',', end = '')
 
 print(ecrire_matrice([[1,2,3], [4,5,6], [7,8,9]]))
-
-
-# def nbLignes(M):
-#   return len(M)
-
-# def nbColonnes(M):
-#   return len(M[0])
 
 # def initialiserMatrice(lignes, colonnes=0, valeur=0):
 #   if colonnes==0:
