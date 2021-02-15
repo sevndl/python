@@ -1,6 +1,6 @@
 from Domino import *
 
-d1 = Domino(5, 3)
+d1 = Domino(0, 0)
 d2 = Domino(3, 5)
 
 print(d1.getMarqueGauche())
