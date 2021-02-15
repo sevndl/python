@@ -26,4 +26,8 @@ class Domino:
     return True if self.marque_droite == self.marque_gauche else False
 
   def afficher(self):
+    if self.marque_droite == 0:
+      return '[ ' + str(self.marque_gauche) + ' |  ]'
+    if self.marque_gauche == 0:
+      return '[  | ' + str(self.marque_droite) + ' ]'
     return '[ ' + str(self.marque_gauche) + ' | ' + str(self.marque_droite) + ' ]'
