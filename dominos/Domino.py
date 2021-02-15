@@ -34,10 +34,29 @@ class Domino:
   def estDouble(self):
     return True if self.__marque_droite == self.__marque_gauche else False
 
-  def comparaison(self, dominoATester):
-    if self.getValeur() < dominoATester.getValeur():
-      return -1
-    elif self.getValeur() == dominoATester.getValeur():
-      return 0
-    else:
-      return 1
+  # opérateurs 
+  def __lt__(self, dominoATester):
+    return self.getValeur() < dominoATester.getValeur()
+    
+  def __le__(self, dominoATester):
+    return self.getValeur() <= dominoATester.getValeur()
+
+  def __eq__(self, dominoATester):
+    return self.getValeur() == dominoATester.getValeur()
+
+  def __gt__(self, dominoATester):
+    return not(self <= dominoATester)
+
+  def __ge__(self, dominoATester):
+    return not(self < dominoATester)
+
+  def __ne__(self, dominoATester):
+    return not(self == dominoATester)
+
+  # def comparaison(self, dominoATester):
+  #   if self.getValeur() < dominoATester.getValeur():
+  #     return -1
+  #   elif self.getValeur() == dominoATester.getValeur():
+  #     return 0
+  #   else:
+  #     return 1
