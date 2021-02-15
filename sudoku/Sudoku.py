@@ -11,14 +11,10 @@ class Sudoku:
       for y in range(1, self.getTaille() + 1):
         valeur = self.getValeur(x, y)
         if valeur > 0:
-          print(valeur, end = '')
+          print(valeur, end = ' ')
         else:
-          print('_', end = '')
-        if y == self.getTaille() + 1:
-          print('\n')
-        else:
-          print(' ', end = '')
-
+          print('_', end = ' ')
+      print()
   def getTaille(self):
     return self.taille
 
