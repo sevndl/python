@@ -1,6 +1,6 @@
 from Domino import *
 
-d1 = Domino(0, 3)
+d1 = Domino(5, 5)
 d2 = Domino(3, 5)
 
 print(d1.getMarqueGauche())
@@ -13,3 +13,4 @@ print(d1.getMarqueDroite())
 print(d1.estDouble())
 print(d1.afficher())
 print(d1.estEquivalent(d2))
+print(d2.comparaison(d1))
