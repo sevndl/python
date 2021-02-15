@@ -35,7 +35,7 @@ class Domino:
   def comparaison(self, dominoATester):
     if self.getValeur() < dominoATester.getValeur():
       return -1
-    if self.getValeur() == dominoATester.getValeur():
+    elif self.getValeur() == dominoATester.getValeur():
       return 0
-    if self.getValeur() > dominoATester.getValeur():
+    else:
       return 1
