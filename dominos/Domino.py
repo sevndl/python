@@ -19,8 +19,8 @@ class Domino:
     self.marque_droite = self.marque_gauche
     self.marque_gauche = tmp_marque_droite
 
-  # def estEquivalent(self, Domino):
-  #   return 
+  def estEquivalent(self, dominoATester):
+    return True if self.getMarqueDroite() == dominoATester.getMarqueDroite() and self.getMarqueGauche() == dominoATester.getMarqueGauche() or self.getMarqueDroite() == dominoATester.getMarqueGauche() and self.getMarqueGauche() == dominoATester.getMarqueDroite() else False
 
   def estDouble(self):
     return True if self.marque_droite == self.marque_gauche else False
