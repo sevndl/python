@@ -24,3 +24,5 @@ try:
   print("Marque droite" + chaine.getMarqueDroite())
 except ExceptionMarqueIncorrecte as e:
   print(e.message)
+except Exception as e:
+  print("Exception intattendue.")
