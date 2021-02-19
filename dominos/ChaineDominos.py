@@ -1,4 +1,5 @@
 from Domino import *
+from ExceptionChaineVide import *
 
 class ChaineDominos(Domino):
   def __init__(self, domino = None):
@@ -21,6 +22,8 @@ class ChaineDominos(Domino):
     return somme
 
   def premierDomino(self):
+    if len(self.__chaine) == 0:
+      raise ExceptionChaineVide()
     return self.__chaine[0]
 
   def dernierDomino(self):
