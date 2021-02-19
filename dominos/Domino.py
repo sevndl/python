@@ -9,9 +9,9 @@ class Domino:
     if self.estDouble():
       return '[  |  ]'
     if self.__marque_droite == 0:
-      return '[ ' + str(self.__marque_gauche) + ' |  ]'
+      return '[ ' + str(self.getMarqueGauche()) + ' |  ]'
     if self.__marque_gauche == 0:
-      return '[  | ' + str(self.__marque_droite) + ' ]'
+      return '[  | ' + str(self.getMarqueDroite()) + ' ]'
     return '[ ' + str(self.__marque_gauche) + ' | ' + str(self.__marque_droite) + ' ]'
 
   def getMarqueGauche(self):
@@ -20,7 +20,7 @@ class Domino:
   def getMarqueDroite(self):
     return self.__marque_droite
 
-  def getValeur(self):
+  def valeur(self):
     return self.__marque_droite + self.__marque_gauche
 
   def inverser(self):
@@ -35,13 +35,13 @@ class Domino:
     return True if self.__marque_droite == self.__marque_gauche else False
 
   def __lt__(self, dominoATester):
-    return self.getValeur() < dominoATester.getValeur()
+    return self.valeur() < dominoATester.valeur()
     
   def __le__(self, dominoATester):
-    return self.getValeur() <= dominoATester.getValeur()
+    return self.valeur() <= dominoATester.valeur()
 
   def __eq__(self, dominoATester):
-    return self.getValeur() == dominoATester.getValeur()
+    return self.valeur() == dominoATester.valeur()
 
   def __gt__(self, dominoATester):
     return not(self <= dominoATester)
