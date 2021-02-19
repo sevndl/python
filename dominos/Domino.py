@@ -13,8 +13,6 @@ class Domino:
 
 
   def afficher(self):
-    if self.estDouble():
-      return '[  |  ]'
     if self.__marque_droite == 0:
       return '[ ' + str(self.getMarqueGauche()) + ' |  ]'
     if self.__marque_gauche == 0:
@@ -39,7 +37,7 @@ class Domino:
     return True if self.getMarqueDroite() == dominoATester.getMarqueDroite() and self.getMarqueGauche() == dominoATester.getMarqueGauche() or self.getMarqueDroite() == dominoATester.getMarqueGauche() and self.getMarqueGauche() == dominoATester.getMarqueDroite() else False
 
   def estDouble(self):
-    return True if self.__marque_droite == self.__marque_gauche else False
+    return True if self.getMarqueGauche() == self.getMarqueDroite() else False
 
   def __lt__(self, dominoATester):
     return self.valeur() < dominoATester.valeur()
