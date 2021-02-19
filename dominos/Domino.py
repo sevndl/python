@@ -1,9 +1,16 @@
+from ExceptionMarqueIncorrecte import *
+
 class Domino:
   def __init__(self, marque_gauche = 0, marque_droite = 0):
     if 0 <= marque_gauche <= 6:
       self.__marque_gauche = marque_gauche
+    else:
+      raise ExceptionMarqueIncorrecte(marque_gauche)
     if 0 <= marque_droite <= 6:
       self.__marque_droite = marque_droite
+    else:
+      raise ExceptionMarqueIncorrecte(marque_droite)
+
 
   def afficher(self):
     if self.estDouble():
