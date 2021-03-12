@@ -2,20 +2,9 @@ class Sudoku:
   def __init__(self, taille = 9, valeur = 0):
     self.taille = taille
     self.grille = self.initialiserGrille(taille, 0)
-    # self.grille = []
 
   def initialiserGrille(self, taille = 9, valeur = 0):
     return [[valeur for iCol in range(0, taille)] for iLig in range(0, taille)]
-
-  def afficher(self):
-    for x in range(1, self.getTaille() + 1):
-      for y in range(1, self.getTaille() + 1):
-        valeur = self.getValeur(x, y)
-        if valeur > 0:
-          print(valeur, end = ' ')
-        else:
-          print('_', end = ' ')
-      print()
 
   def getTaille(self):
     return self.taille
@@ -27,6 +16,5 @@ class Sudoku:
     return self.getGrille()[colonne - 1][ligne - 1]
 
   def setValeur(self, colonne, ligne, valeur):
-    # valeurs entre 1 et 9
-    if valeur <= 9:
+    if valeur <= self.getTaille():
       self.getGrille()[colonne - 1][ligne - 1] = valeur

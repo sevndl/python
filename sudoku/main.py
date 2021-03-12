@@ -2,22 +2,7 @@ from Sudoku import *
 from tkinter import *
 import math
 
-# Définition des variables
-grilleInitiale = Sudoku(9)
-grilleDeJeu = Sudoku(9)
-tailleGrille = grilleDeJeu.getTaille()
-tailleCase = 50
-tailleCanvas = (tailleGrille * tailleCase) + 2
-hauteurMainWindow = tailleCanvas + 100
-largeurMainWindow = tailleCanvas + 100
-
-# Fenêtre principale
-mainWindow = Tk()
-mainWindow.title('Projet sudoku en python')
-mainWindow.minsize(width = largeurMainWindow, height = hauteurMainWindow)
-
-# Initialisation de la variable servant à récupérer l'entrée utilisateur dans une case
-valeurUtilisateur = StringVar()
+########## FONCTIONS ##########
 
 # Fonction pour charger la grille depuis un fichier texte
 def chargerGrille(nomFichier, grilleARemplir):
@@ -80,30 +65,49 @@ def inverserValeur(colonne, ligne):
 
 # Fonction pour vérifier si un nombre est déjà dans la case
 def nombreEstDansLaCase(event):
-  x = event.x
-  y = event.y
+  caseCliqueeX.set(event.x)
+  caseCliqueeY.set(event.y)
   entry.delete(0, END)
-  print(getValeurCase(x, y))
-  if getValeurCase(x, y) <= 0:
+  if getValeurCase(caseCliqueeX.get(), caseCliqueeY.get()) <= 0:
     entry.config(state = NORMAL)
     entry.focus()
+    entry.bind('<Return>', verifierEntree)
   else:
     entry.config(state = DISABLED)
     mainWindow.focus_set()
-    # if valeurUtilisateur.get().isdigit():
-    #   verifierEntree(x, y)
 
 # Fonction pour valider l'entrée de l'utilisateur
-def verifierEntree(x, y):
-  valeurAValider = int(valeurUtilisateur.get())
-  print(valeurAValider)
-  print("x: " + str(getColonne(x)))
-  print("y: " + str(getLigne(y)))
-  if 1 <= valeurAValider <= 9:
-    if valeurAValider == inverserValeur(x, y):
-      grilleDeJeu.setValeur(getColonne(x), getLigne(y), valeurAValider)
-      affichageValeurs()
+def verifierEntree(event):
+  if valeurUtilisateur.get().isdigit():
+    valeurAValider = int(valeurUtilisateur.get())
+    if 1 <= valeurAValider <= 9:
+      if valeurAValider == inverserValeur(caseCliqueeX.get(), caseCliqueeY.get()):
+        grilleDeJeu.setValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()), valeurAValider)
+        affichageValeurs()
   entry.delete(0, END)
+  mainWindow.focus_set()
+
+########## MAIN ##########
+
+# Déclaration des variables
+grilleInitiale = Sudoku(9)
+grilleDeJeu = Sudoku(9)
+tailleGrille = grilleDeJeu.getTaille()
+tailleCase = 50
+tailleCanvas = (tailleGrille * tailleCase) + 2
+marges = 100
+hauteurMainWindow = tailleCanvas + marges
+largeurMainWindow = tailleCanvas + marges
+
+# Fenêtre principale
+mainWindow = Tk()
+mainWindow.title('Projet sudoku en python')
+mainWindow.minsize(width = largeurMainWindow, height = hauteurMainWindow)
+
+# Déclaration des variables de contrôle
+valeurUtilisateur = StringVar()
+caseCliqueeX = IntVar()
+caseCliqueeY = IntVar()
 
 # Champ d'entrée de l'utilisateur
 entry = Entry(mainWindow, textvariable = valeurUtilisateur)
