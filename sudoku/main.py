@@ -10,9 +10,18 @@ tailleCanvas = (tailleGrille * tailleCase) + 2
 hauteurMainWindow = tailleCanvas + 100
 largeurMainWindow = tailleCanvas + 100
 
-grille.setValeur(1, 1, 8)
-grille.setValeur(4, 7, 2)
-grille.setValeur(5, 7, 6)
+# grille.setValeur(1, 1, 8)
+# grille.setValeur(4, 7, 2)
+# grille.setValeur(9, 9, 6)
+
+# Fonction pour charger la grille depuis un fichier texte
+def charger(nomFichier):
+  with open(nomFichier) as f:
+    contenu = f.readlines()
+  contenu = [x.strip() for x in contenu]
+
+  for ligne in contenu:
+    grille.getGrille().append([int(x) for x in ligne.split()])
 
 # Fonction d'affichage de la grille
 # Ligne plus épaisse tous les (multiples de la
@@ -65,6 +74,7 @@ playGround = Canvas(
 playGround.place(relx = 0.5, rely = 0.5, anchor = CENTER)
 
 # Affichage de la grille
+charger("/Users/sevndl/Desktop/code/python/sudoku/grille.txt")
 affichageGrille()
 affichageValeurs()
 
