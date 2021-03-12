@@ -10,18 +10,25 @@ tailleCanvas = (tailleGrille * tailleCase) + 2
 hauteurMainWindow = tailleCanvas + 100
 largeurMainWindow = tailleCanvas + 100
 
-# grille.setValeur(1, 1, 8)
+# grille.setValeur(2, 1, (grille.getValeur(2, 1)) * (-1))
 # grille.setValeur(4, 7, 2)
 # grille.setValeur(9, 9, 6)
 
 # Fonction pour charger la grille depuis un fichier texte
-def charger(nomFichier):
+def chargerGrille(nomFichier):
+  y = 1
   with open(nomFichier) as f:
-    contenu = f.readlines()
-  contenu = [x.strip() for x in contenu]
+    lignes = f.readlines()
+  for ligne in lignes:
+    x = 1
+    for valeur in ligne.split():
+      grille.setValeur(x, y, int(valeur))
+      x += 1
+    y += 1
 
-  for ligne in contenu:
-    grille.getGrille().append([int(x) for x in ligne.split()])
+  # lignesPasSplit = [l.strip() for l in lignes]
+  # for ligne in lignesPasSplit:
+  #   grille.getGrille().append([int(valeur) for valeur in ligne.split()])
 
 # Fonction d'affichage de la grille
 # Ligne plus épaisse tous les (multiples de la
@@ -74,7 +81,7 @@ playGround = Canvas(
 playGround.place(relx = 0.5, rely = 0.5, anchor = CENTER)
 
 # Affichage de la grille
-charger("/Users/sevndl/Desktop/code/python/sudoku/grille.txt")
+chargerGrille("/Users/sevndl/Desktop/code/python/sudoku/bordel.txt")
 affichageGrille()
 affichageValeurs()
 
