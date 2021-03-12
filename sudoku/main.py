@@ -10,7 +10,6 @@ tailleCanvas = (tailleGrille * tailleCase) + 2
 hauteurMainWindow = tailleCanvas + 100
 largeurMainWindow = tailleCanvas + 100
 
-# grille.setValeur(2, 1, (grille.getValeur(2, 1)) * (-1))
 # grille.setValeur(4, 7, 2)
 # grille.setValeur(9, 9, 6)
 
@@ -21,14 +20,10 @@ def chargerGrille(nomFichier):
     lignes = f.readlines()
   for ligne in lignes:
     x = 1
-    for valeur in ligne.split():
+    for valeur in ligne.split(" "):
       grille.setValeur(x, y, int(valeur))
       x += 1
     y += 1
-
-  # lignesPasSplit = [l.strip() for l in lignes]
-  # for ligne in lignesPasSplit:
-  #   grille.getGrille().append([int(valeur) for valeur in ligne.split()])
 
 # Fonction d'affichage de la grille
 # Ligne plus épaisse tous les (multiples de la
@@ -66,6 +61,10 @@ def affichageValeurs():
           text = valeur
         )
 
+# Fonction pour inverser la valeur d'une case
+def inverserValeur(colonne, ligne):
+  return grille.getValeur(colonne, ligne) * -1
+
 # Fenêtre principale
 mainWindow = Tk()
 mainWindow.title("Projet sudoku en python")
@@ -83,6 +82,7 @@ playGround.place(relx = 0.5, rely = 0.5, anchor = CENTER)
 # Affichage de la grille
 chargerGrille("/Users/sevndl/Desktop/code/python/sudoku/bordel.txt")
 affichageGrille()
+grille.setValeur(3, 4, inverserValeur(3, 4))
 affichageValeurs()
 
 # Affichage de la fenêtre principale,

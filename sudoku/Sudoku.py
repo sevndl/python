@@ -23,11 +23,10 @@ class Sudoku:
   def getGrille(self):
     return self.grille
 
-  def getValeur(self, ligne, colonne):
-    # valeurs entre 1 et 9
-    return self.getGrille()[ligne - 1][colonne - 1]
+  def getValeur(self, colonne, ligne):
+    return self.getGrille()[colonne - 1][ligne - 1]
 
-  def setValeur(self, ligne, colonne, valeur):
+  def setValeur(self, colonne, ligne, valeur):
     # valeurs entre 1 et 9
-    if 1 <= valeur <= 9:
-      self.getGrille()[ligne - 1][colonne - 1] = valeur
+    if valeur <= 9:
+      self.getGrille()[colonne - 1][ligne - 1] = valeur
