@@ -10,8 +10,12 @@ tailleCanvas = (tailleGrille * tailleCase) + 2
 hauteurMainWindow = tailleCanvas + 100
 largeurMainWindow = tailleCanvas + 100
 
-# grille.setValeur(4, 7, 2)
-# grille.setValeur(9, 9, 6)
+# Fenêtre principale
+mainWindow = Tk()
+mainWindow.title('Projet sudoku en python')
+mainWindow.minsize(width = largeurMainWindow, height = hauteurMainWindow)
+
+valeurUtilisateur = IntVar()
 
 # Fonction pour charger la grille depuis un fichier texte
 def chargerGrille(nomFichier):
@@ -57,7 +61,7 @@ def affichageValeurs():
         playGround.create_text(
           ((x * tailleCase) - (tailleCase / 2)) + 4 ,
           ((y * tailleCase) - (tailleCase / 2)) + 4,
-          fill = "black",
+          fill = 'black',
           text = valeur
         )
 
@@ -65,10 +69,25 @@ def affichageValeurs():
 def inverserValeur(colonne, ligne):
   return grille.getValeur(colonne, ligne) * -1
 
-# Fenêtre principale
-mainWindow = Tk()
-mainWindow.title("Projet sudoku en python")
-mainWindow.minsize(width = largeurMainWindow, height = hauteurMainWindow)
+# Fonction pour afficher un input text dans la case que le joueur a sélectionnée
+def afficherEntry(event):
+  x = event.x
+  y = event.y
+  entry = Entry(playGround, textvariable = valeurUtilisateur)
+  entry.place(
+    x = x // tailleGrille,
+    y = y // tailleGrille
+  )
+  
+  entry.bind('<Return>', validerEntree)
+
+# Fonction pour valider l'entrée de l'utilisateur
+def validerEntree(event):
+  valeurAValider = valeurUtilisateur.get()
+  if 1 <= valeurAValider <= 9:
+    print('chiffre ok')
+  else:
+    print('chiffre pas ok')
 
 # Canvas du plateau de jeu
 playGround = Canvas(
@@ -78,9 +97,10 @@ playGround = Canvas(
   width = tailleCanvas
 )
 playGround.place(relx = 0.5, rely = 0.5, anchor = CENTER)
+playGround.bind('<Button-1>', afficherEntry)
 
 # Affichage de la grille
-chargerGrille("/Users/sevndl/Desktop/code/python/sudoku/bordel.txt")
+chargerGrille('/Users/sevndl/Desktop/code/python/sudoku/bordel.txt')
 affichageGrille()
 grille.setValeur(3, 4, inverserValeur(3, 4))
 affichageValeurs()
