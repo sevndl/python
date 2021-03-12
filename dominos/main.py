@@ -19,22 +19,18 @@ try:
   d1 = Domino(3, 1)
   d2 = Domino(1, 5)
   d3 = Domino(5, 0)
-  d4 = Domino(4, 3)
+  d4 = Domino(4, 0)
   chaine = ChaineDominos(d1)
   chaine.afficher()
   chaine = chaine + d2
   chaine.afficher()
   chaine = chaine + d3
   chaine.afficher()
-  chaine = chaine + d4
-  chaine.afficher()
+  # chaine = d4 + chaine
+  # chaine.afficher()
   print("Valeur :", chaine.valeur())
   print("Marque gauche :", chaine.getMarqueGauche())
   print("Marque droite :", chaine.getMarqueDroite())
-  if chaine.estDouble():
-    print("chaine double")
-  else:
-    print("pas double")
 except ExceptionMarqueIncorrecte as e:
   print(e.message)
 except ExceptionChaineVide as e:

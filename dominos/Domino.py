@@ -56,3 +56,15 @@ class Domino:
 
   def __ne__(self, dominoATester):
     return not(self == dominoATester)
+
+  def __add__(self, chaine):
+    if len(chaine.getChaine()) == 0:
+      chaine.append(self)
+    else:
+      if chaine.getMarqueGauche() == self.getMarqueDroite():
+        chaine.getChaine().insert(0, self)
+      elif chaine.getMarqueDroite() == self.getMarqueDroite():
+        chaine.getChaine().insert(0, self.inverser())
+      else:
+        raise ExceptionDominoIncorrect()
+    return chaine

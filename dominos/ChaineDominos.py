@@ -9,6 +9,9 @@ class ChaineDominos(Domino):
     else:
       self.__chaine = [domino]
 
+  def getChaine(self):
+    return self.__chaine
+
   def afficher(self):
     for domino in self.__chaine:
       if domino != self.dernierDomino():
