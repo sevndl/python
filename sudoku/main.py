@@ -45,9 +45,6 @@ def getColonne(x):
 def getLigne(y):
   return (y // tailleCase) + 1
 
-def getValeurCase(x, y, grille):
-  return grille.getValeur(getColonne(x), getLigne(y))
-
 def affichageValeurs():
   for x in range(1, tailleGrille + 1):
     for y in range(1, tailleGrille + 1):
@@ -56,7 +53,7 @@ def affichageValeurs():
       if valeurJeu > 0:
         playGround.delete("valeur" + str(x) + str(y))
         playGround.create_text(
-          ((x * tailleCase) - (tailleCase / 2)) + 4 ,
+          ((x * tailleCase) - (tailleCase / 2)) + 4,
           ((y * tailleCase) - (tailleCase / 2)) + 4,
           fill = 'green' if valeurJeu == valeurInitiale else 'orange',
           text = valeurJeu,
@@ -71,7 +68,7 @@ def nombreEstDansLaCase(event):
   caseCliqueeX.set(event.x)
   caseCliqueeY.set(event.y)
   entreeUtilisateur.delete(0, END)
-  if getValeurCase(caseCliqueeX.get(), caseCliqueeY.get(), grilleVerifiee) <= 0:
+  if grilleVerifiee.getValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get())) <= 0:
     entreeUtilisateur.config(state = NORMAL)
     entreeUtilisateur.focus()
     entreeUtilisateur.bind('<Return>', verifierEntree)
@@ -87,6 +84,7 @@ def verifierEntree(event):
       grilleDeJeu.setValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()), valeurAValider)
       affichageValeurs()
   entreeUtilisateur.delete(0, END)
+  entreeUtilisateur.config(state = DISABLED)
   mainWindow.focus_set()
 
 # Fonction pour vérifier si la valeur de chaque case remplie est correcte
@@ -98,6 +96,21 @@ def verifierGrille():
       if valeurJeu == valeurVerifiee:
         grilleVerifiee.setValeur(x, y, valeurJeu)
   affichageValeurs()
+  if verificationPartieTerminee():
+    boutonVerification.config(state = DISABLED)
+    entreeUtilisateur.config(state = DISABLED)
+    messageGagne = Label(utilisateurFrame, text = "Gagné !")
+    messageGagne.pack()
+
+# Fonction pour vérifier si la partie est terminée
+def verificationPartieTerminee():
+  casesRestantes = 0
+  for x in range(1, tailleGrille + 1):
+    for y in range(1, tailleGrille + 1):
+      valeurCaseCourante = grilleVerifiee.getValeur(x, y)
+      if valeurCaseCourante <= 0:
+        casesRestantes += 1
+  return True if casesRestantes == 0 else False
 
 ########## MAIN ##########
 
@@ -108,7 +121,7 @@ tailleGrille = grilleDeJeu.getTaille()
 tailleCase = 50
 tailleCanvas = (tailleGrille * tailleCase) + 2
 marges = 100
-hauteurMainWindow = tailleCanvas + marges
+hauteurMainWindow = tailleCanvas
 largeurMainWindow = tailleCanvas + marges
 
 # Fenêtre principale
@@ -116,24 +129,44 @@ mainWindow = Tk()
 mainWindow.title('Projet sudoku en python')
 mainWindow.minsize(width = largeurMainWindow, height = hauteurMainWindow)
 
+# Frame du plateau
+plateauFrame = Frame(
+  mainWindow,
+  padx = 10,
+  pady = 10
+)
+plateauFrame.pack(side = LEFT)
+
+# Frame des contrôles utilisateur
+utilisateurFrame = Frame(
+  mainWindow,
+  padx = 10,
+  pady = 10
+)
+utilisateurFrame.pack(side = RIGHT)
+
 # Déclaration des variables de contrôle
 valeurUtilisateur = StringVar()
 caseCliqueeX = IntVar()
 caseCliqueeY = IntVar()
 
+# Canvas du plateau de jeu
+playGround = Canvas(
+  plateauFrame,
+  height = tailleCanvas,
+  width = tailleCanvas
+)
+playGround.pack(side = LEFT)
+playGround.bind('<Button-1>', nombreEstDansLaCase)
+
 # Champ d'entrée de l'utilisateur
-entreeUtilisateur = Entry(mainWindow, textvariable = valeurUtilisateur)
+entreeUtilisateur = Entry(utilisateurFrame, textvariable = valeurUtilisateur)
 entreeUtilisateur.config(state = DISABLED)
 entreeUtilisateur.pack()
 
 # Bouton de vérification de la grille
-boutonVerification = Button(mainWindow, text = "Vérifier la grille", command = verifierGrille)
+boutonVerification = Button(utilisateurFrame, text = "Vérifier la grille", command = verifierGrille)
 boutonVerification.pack()
-
-# Canvas du plateau de jeu
-playGround = Canvas(mainWindow, bg = 'white', height = tailleCanvas, width = tailleCanvas)
-playGround.place(relx = 0.5, rely = 0.5, anchor = CENTER)
-playGround.bind('<Button-1>', nombreEstDansLaCase)
 
 # Affichage de la grille
 chargerGrille('/Users/sevndl/Desktop/code/python/sudoku/bordel.txt', grilleVerifiee)
