@@ -63,8 +63,8 @@ def affichageValeurs():
           tag = "valeur" + str(x) + str(y)
         )
 
-def inverserValeur(colonne, ligne, grille):
-  return getValeurCase(colonne, ligne, grille) * -1
+def inverserValeur(valeur):
+  return valeur * -1
 
 # Fonction pour vérifier si un nombre est déjà dans la case
 def nombreEstDansLaCase(event):
@@ -94,8 +94,7 @@ def verifierGrille():
   for x in range(1, tailleGrille + 1):
     for y in range(1, tailleGrille + 1):
       valeurJeu = grilleDeJeu.getValeur(x, y)
-      valeurVerifiee = grilleVerifiee.getValeur(x, y) * -1
-      print(valeurVerifiee, valeurJeu)
+      valeurVerifiee = inverserValeur(grilleVerifiee.getValeur(x, y))
       if valeurJeu == valeurVerifiee:
         grilleVerifiee.setValeur(x, y, valeurJeu)
   affichageValeurs()
