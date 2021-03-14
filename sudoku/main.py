@@ -70,28 +70,35 @@ def inverserValeur(colonne, ligne, grille):
 def nombreEstDansLaCase(event):
   caseCliqueeX.set(event.x)
   caseCliqueeY.set(event.y)
-  entry.delete(0, END)
+  entreeUtilisateur.delete(0, END)
   if getValeurCase(caseCliqueeX.get(), caseCliqueeY.get(), grilleVerifiee) <= 0:
-    entry.config(state = NORMAL)
-    entry.focus()
-    entry.bind('<Return>', verifierEntree)
+    entreeUtilisateur.config(state = NORMAL)
+    entreeUtilisateur.focus()
+    entreeUtilisateur.bind('<Return>', verifierEntree)
   else:
-    entry.config(state = DISABLED)
+    entreeUtilisateur.config(state = DISABLED)
     mainWindow.focus_set()
 
 # Fonction pour valider l'entrée de l'utilisateur à chaque case remplie
-########## À MODIFIER SI JE DOIS VÉRIFIER SEULEMENT À L'APPUI SUR UN BOUTON ##########
 def verifierEntree(event):
   if valeurUtilisateur.get().isdigit():
     valeurAValider = int(valeurUtilisateur.get())
     if 1 <= valeurAValider <= 9:
-      # if valeurAValider == inverserValeur(caseCliqueeX.get(), caseCliqueeY.get()):
-      #   grilleDeJeu.setValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()), valeurAValider)
-      #   affichageValeurs()
       grilleDeJeu.setValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()), valeurAValider)
       affichageValeurs()
-  entry.delete(0, END)
+  entreeUtilisateur.delete(0, END)
   mainWindow.focus_set()
+
+# Fonction pour vérifier si la valeur de chaque case remplie est correcte
+def verifierGrille():
+  for x in range(1, tailleGrille + 1):
+    for y in range(1, tailleGrille + 1):
+      valeurJeu = grilleDeJeu.getValeur(x, y)
+      valeurVerifiee = grilleVerifiee.getValeur(x, y) * -1
+      print(valeurVerifiee, valeurJeu)
+      if valeurJeu == valeurVerifiee:
+        grilleVerifiee.setValeur(x, y, valeurJeu)
+  affichageValeurs()
 
 ########## MAIN ##########
 
@@ -116,9 +123,13 @@ caseCliqueeX = IntVar()
 caseCliqueeY = IntVar()
 
 # Champ d'entrée de l'utilisateur
-entry = Entry(mainWindow, textvariable = valeurUtilisateur)
-entry.config(state = DISABLED)
-entry.pack()
+entreeUtilisateur = Entry(mainWindow, textvariable = valeurUtilisateur)
+entreeUtilisateur.config(state = DISABLED)
+entreeUtilisateur.pack()
+
+# Bouton de vérification de la grille
+boutonVerification = Button(mainWindow, text = "Vérifier la grille", command = verifierGrille)
+boutonVerification.pack()
 
 # Canvas du plateau de jeu
 playGround = Canvas(mainWindow, bg = 'white', height = tailleCanvas, width = tailleCanvas)
