@@ -39,36 +39,39 @@ def affichageGrille():
       width = 2 if (y % math.sqrt(tailleGrille) == 0) else 1
     )
 
-def affichageValeurs():
-  for x in range(1, tailleGrille + 1):
-    for y in range(1, tailleGrille + 1):
-      valeur = grilleDeJeu.getValeur(x, y)
-      if valeur > 0:
-        playGround.create_text(
-          ((x * tailleCase) - (tailleCase / 2)) + 4 ,
-          ((y * tailleCase) - (tailleCase / 2)) + 4,
-          fill = 'black',
-          text = valeur
-        )
-
 def getColonne(x):
   return (x // tailleCase) + 1
 
 def getLigne(y):
   return (y // tailleCase) + 1
 
-def getValeurCase(x, y):
-  return grilleDeJeu.getValeur(getColonne(x), getLigne(y))
+def getValeurCase(x, y, grille):
+  return grille.getValeur(getColonne(x), getLigne(y))
 
-def inverserValeur(colonne, ligne):
-  return getValeurCase(colonne, ligne) * -1
+def affichageValeurs():
+  for x in range(1, tailleGrille + 1):
+    for y in range(1, tailleGrille + 1):
+      valeurJeu = grilleDeJeu.getValeur(x, y)
+      valeurInitiale = grilleVerifiee.getValeur(x, y)
+      if valeurJeu > 0:
+        playGround.delete("valeur" + str(x) + str(y))
+        playGround.create_text(
+          ((x * tailleCase) - (tailleCase / 2)) + 4 ,
+          ((y * tailleCase) - (tailleCase / 2)) + 4,
+          fill = 'green' if valeurJeu == valeurInitiale else 'orange',
+          text = valeurJeu,
+          tag = "valeur" + str(x) + str(y)
+        )
+
+def inverserValeur(colonne, ligne, grille):
+  return getValeurCase(colonne, ligne, grille) * -1
 
 # Fonction pour vérifier si un nombre est déjà dans la case
 def nombreEstDansLaCase(event):
   caseCliqueeX.set(event.x)
   caseCliqueeY.set(event.y)
   entry.delete(0, END)
-  if getValeurCase(caseCliqueeX.get(), caseCliqueeY.get()) <= 0:
+  if getValeurCase(caseCliqueeX.get(), caseCliqueeY.get(), grilleVerifiee) <= 0:
     entry.config(state = NORMAL)
     entry.focus()
     entry.bind('<Return>', verifierEntree)
@@ -76,21 +79,24 @@ def nombreEstDansLaCase(event):
     entry.config(state = DISABLED)
     mainWindow.focus_set()
 
-# Fonction pour valider l'entrée de l'utilisateur
+# Fonction pour valider l'entrée de l'utilisateur à chaque case remplie
+########## À MODIFIER SI JE DOIS VÉRIFIER SEULEMENT À L'APPUI SUR UN BOUTON ##########
 def verifierEntree(event):
   if valeurUtilisateur.get().isdigit():
     valeurAValider = int(valeurUtilisateur.get())
     if 1 <= valeurAValider <= 9:
-      if valeurAValider == inverserValeur(caseCliqueeX.get(), caseCliqueeY.get()):
-        grilleDeJeu.setValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()), valeurAValider)
-        affichageValeurs()
+      # if valeurAValider == inverserValeur(caseCliqueeX.get(), caseCliqueeY.get()):
+      #   grilleDeJeu.setValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()), valeurAValider)
+      #   affichageValeurs()
+      grilleDeJeu.setValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()), valeurAValider)
+      affichageValeurs()
   entry.delete(0, END)
   mainWindow.focus_set()
 
 ########## MAIN ##########
 
 # Déclaration des variables
-grilleInitiale = Sudoku(9)
+grilleVerifiee = Sudoku(9)
 grilleDeJeu = Sudoku(9)
 tailleGrille = grilleDeJeu.getTaille()
 tailleCase = 50
@@ -115,12 +121,12 @@ entry.config(state = DISABLED)
 entry.pack()
 
 # Canvas du plateau de jeu
-playGround = Canvas(mainWindow, bg = 'light blue', height = tailleCanvas, width = tailleCanvas)
+playGround = Canvas(mainWindow, bg = 'white', height = tailleCanvas, width = tailleCanvas)
 playGround.place(relx = 0.5, rely = 0.5, anchor = CENTER)
 playGround.bind('<Button-1>', nombreEstDansLaCase)
 
 # Affichage de la grille
-chargerGrille('/Users/sevndl/Desktop/code/python/sudoku/bordel.txt', grilleInitiale)
+chargerGrille('/Users/sevndl/Desktop/code/python/sudoku/bordel.txt', grilleVerifiee)
 chargerGrille('/Users/sevndl/Desktop/code/python/sudoku/bordel.txt', grilleDeJeu)
 affichageGrille()
 affichageValeurs()
