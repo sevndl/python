@@ -1,3 +1,4 @@
+from tkinter.font import Font
 from Sudoku import *
 from tkinter import *
 import math
@@ -11,7 +12,7 @@ def chargerGrille(nomFichier, grilleARemplir):
     lignes = f.readlines()
   for ligne in lignes:
     x = 1
-    for valeur in ligne.split(" "):
+    for valeur in ligne.split(' '):
       grilleARemplir.setValeur(x, y, int(valeur))
       x += 1
     y += 1
@@ -49,15 +50,36 @@ def affichageValeurs():
   for x in range(1, tailleGrille + 1):
     for y in range(1, tailleGrille + 1):
       valeurJeu = grilleDeJeu.getValeur(x, y)
-      valeurInitiale = grilleVerifiee.getValeur(x, y)
+      valeurVerifiee = grilleVerifiee.getValeur(x, y)
+      valeurInitiale = grilleInitiale.getValeur(x, y)
       if valeurJeu > 0:
-        playGround.delete("valeur" + str(x) + str(y))
+        precedentEtat = playGround.gettags('valeur' + str(x) + str(y))
+        playGround.delete('valeur' + str(x) + str(y))
+        if valeurJeu == valeurInitiale:
+          couleur = 'black'
+          police = Font(size = 15, weight = 'normal')
+          etat = 'initial'
+        elif valeurJeu == valeurVerifiee:
+          couleur = 'green'
+          police = Font(size = 15, weight = 'normal')
+          etat = 'correct'
+        else:
+          if precedentEtat == () or precedentEtat[1] == 'nonVerifie':
+            couleur = 'orange'
+            police = Font(size = 15, weight = 'normal')
+            etat = 'nonVerifie'
+          elif precedentEtat == ('valeur' + str(x) + str(y), 'incorrect'):
+            couleur = 'red'
+            police = Font(size = 15, weight = 'normal')
+            etat = 'incorrect'
+
         playGround.create_text(
           ((x * tailleCase) - (tailleCase / 2)) + 4,
           ((y * tailleCase) - (tailleCase / 2)) + 4,
-          fill = 'green' if valeurJeu == valeurInitiale else 'orange',
+          fill = couleur,
+          font = police,
           text = valeurJeu,
-          tag = "valeur" + str(x) + str(y)
+          tag = ('valeur' + str(x) + str(y), etat)
         )
 
 def inverserValeur(valeur):
@@ -82,6 +104,10 @@ def verifierEntree(event):
     valeurAValider = int(valeurUtilisateur.get())
     if 1 <= valeurAValider <= 9:
       grilleDeJeu.setValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()), valeurAValider)
+      playGround.itemconfig(
+        'valeur' + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())),
+        tag = ('valeur' + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())), 'nonVerifie')
+      )
       affichageValeurs()
   entreeUtilisateur.delete(0, END)
   entreeUtilisateur.config(state = DISABLED)
@@ -91,15 +117,19 @@ def verifierEntree(event):
 def verifierGrille():
   for x in range(1, tailleGrille + 1):
     for y in range(1, tailleGrille + 1):
-      valeurJeu = grilleDeJeu.getValeur(x, y)
-      valeurVerifiee = inverserValeur(grilleVerifiee.getValeur(x, y))
-      if valeurJeu == valeurVerifiee:
-        grilleVerifiee.setValeur(x, y, valeurJeu)
+      precedentEtat = playGround.gettags('valeur' + str(x) + str(y))
+      if precedentEtat != ('valeur' + str(x) + str(y), 'correct'):
+        valeurJeu = grilleDeJeu.getValeur(x, y)
+        valeurVerifiee = inverserValeur(grilleVerifiee.getValeur(x, y))
+        if valeurJeu == valeurVerifiee:
+          grilleVerifiee.setValeur(x, y, valeurJeu)
+        else:
+          playGround.itemconfig('valeur' + str(x) + str(y), tag = ('valeur' + str(x) + str(y), 'incorrect'))
   affichageValeurs()
   if verificationPartieTerminee():
     boutonVerification.config(state = DISABLED)
     entreeUtilisateur.config(state = DISABLED)
-    messageGagne = Label(utilisateurFrame, text = "Gagné !")
+    messageGagne = Label(utilisateurFrame, text = 'Gagné !')
     messageGagne.pack()
 
 # Fonction pour vérifier si la partie est terminée
@@ -115,6 +145,7 @@ def verificationPartieTerminee():
 ########## MAIN ##########
 
 # Déclaration des variables
+grilleInitiale = Sudoku(9)
 grilleVerifiee = Sudoku(9)
 grilleDeJeu = Sudoku(9)
 tailleGrille = grilleDeJeu.getTaille()
@@ -165,10 +196,11 @@ entreeUtilisateur.config(state = DISABLED)
 entreeUtilisateur.pack()
 
 # Bouton de vérification de la grille
-boutonVerification = Button(utilisateurFrame, text = "Vérifier la grille", command = verifierGrille)
+boutonVerification = Button(utilisateurFrame, text = 'Vérifier la grille', command = verifierGrille)
 boutonVerification.pack()
 
 # Affichage de la grille
+chargerGrille('/Users/sevndl/Desktop/code/python/sudoku/bordel.txt', grilleInitiale)
 chargerGrille('/Users/sevndl/Desktop/code/python/sudoku/bordel.txt', grilleVerifiee)
 chargerGrille('/Users/sevndl/Desktop/code/python/sudoku/bordel.txt', grilleDeJeu)
 affichageGrille()

@@ -1,7 +1,7 @@
 class Sudoku:
   def __init__(self, taille = 9, valeur = 0):
     self.taille = taille
-    self.grille = self.initialiserGrille(taille, 0)
+    self.grille = self.initialiserGrille(taille, valeur)
 
   def initialiserGrille(self, taille = 9, valeur = 0):
     return [[valeur for iCol in range(0, taille)] for iLig in range(0, taille)]
