@@ -27,7 +27,7 @@ def affichageGrille():
   for x in range(0, tailleGrille + 1):
     playGround.create_line(
       (x * tailleCase) + 4,
-      0,
+      4,
       (x * tailleCase) + 4,
       (tailleGrille * tailleCase) + 4,
       width = 2 if (x % math.sqrt(tailleGrille) == 0) else 1
@@ -35,7 +35,7 @@ def affichageGrille():
   # Lignes horizontales
   for y in range(0, tailleGrille + 1):
     playGround.create_line(
-      0,
+      4,
       (y * tailleCase) + 4,
       (tailleGrille * tailleCase) + 4,
       (y * tailleCase) + 4,
@@ -177,7 +177,7 @@ grilleVerifiee = Sudoku(9)
 grilleDeJeu = Sudoku(9)
 tailleGrille = grilleDeJeu.getTaille()
 tailleCase = 50
-tailleCanvas = (tailleGrille * tailleCase) + 2
+tailleCanvas = (tailleGrille * tailleCase) + 4
 marges = 100
 hauteurMainWindow = tailleCanvas
 largeurMainWindow = tailleCanvas + marges
@@ -245,9 +245,9 @@ boutonVerification = Button(utilisateurFrame, text = 'Vérifier la grille', comm
 boutonVerification.pack()
 
 # Affichage de la grille
-chargerGrille('/Users/sevndl/Desktop/code/python/sudoku/bordel.txt', grilleInitiale)
-chargerGrille('/Users/sevndl/Desktop/code/python/sudoku/bordel.txt', grilleVerifiee)
-chargerGrille('/Users/sevndl/Desktop/code/python/sudoku/bordel.txt', grilleDeJeu)
+chargerGrille('sudoku/bordel.txt', grilleInitiale)
+chargerGrille('sudoku/bordel.txt', grilleVerifiee)
+chargerGrille('sudoku/bordel.txt', grilleDeJeu)
 affichageGrille()
 affichageValeurs()
 
