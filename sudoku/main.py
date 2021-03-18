@@ -1,6 +1,8 @@
 from tkinter.font import Font
 from Sudoku import *
 from tkinter import *
+from tkinter import filedialog
+
 import math
 
 ########## FONCTIONS ##########
@@ -18,7 +20,7 @@ def chargerGrille(nomFichier, grilleARemplir):
     y += 1
 
 # Fonction d'affichage de la grille
-# Ligne plus épaisse tous les (multiples de la
+# Ligne plus épaisse toutes les (multiples de la
 # racine carrée de la taille de la grille) cases
 def affichageGrille():
   # Lignes verticales
@@ -57,27 +59,22 @@ def affichageValeurs():
         playGround.delete('valeur' + str(x) + str(y))
         if valeurJeu == valeurInitiale:
           couleur = 'black'
-          police = Font(size = 15, weight = 'normal')
           etat = 'initial'
         elif valeurJeu == valeurVerifiee:
           couleur = 'green'
-          police = Font(size = 15, weight = 'normal')
           etat = 'correct'
         else:
           if precedentEtat == () or precedentEtat[1] == 'nonVerifie':
             couleur = 'orange'
-            police = Font(size = 15, weight = 'normal')
             etat = 'nonVerifie'
           elif precedentEtat == ('valeur' + str(x) + str(y), 'incorrect'):
             couleur = 'red'
-            police = Font(size = 15, weight = 'normal')
             etat = 'incorrect'
-
         playGround.create_text(
           ((x * tailleCase) - (tailleCase / 2)) + 4,
           ((y * tailleCase) - (tailleCase / 2)) + 4,
           fill = couleur,
-          font = police,
+          font = Font(size = 15, weight = 'normal'),
           text = valeurJeu,
           tag = ('valeur' + str(x) + str(y), etat)
         )
@@ -142,7 +139,23 @@ def verificationPartieTerminee():
         casesRestantes += 1
   return True if casesRestantes == 0 else False
 
-########## MAIN ##########
+# Fonction pour sauvegarder la partie dans un fichier .txt
+def sauvegarderPartie():
+  sauvegardeFichier = filedialog.asksaveasfilename(
+    title = 'Enregistrer sous...',
+    defaultextension = 'txt',
+    filetypes = [('Text File', 'txt')])
+  grille = ''
+  for x in range(1, tailleGrille + 1):
+    for y in range(1, tailleGrille + 1):
+      valeurJeu = str(grilleDeJeu.getValeur(y, x))
+      grille += valeurJeu + ' ' if y < tailleGrille else valeurJeu + '\n'
+  with open(sauvegardeFichier, 'w') as f:
+    f.write(grille)
+
+
+
+########## CODE PRINCIPAL ##########
 
 # Déclaration des variables
 grilleInitiale = Sudoku(9)
@@ -159,6 +172,14 @@ largeurMainWindow = tailleCanvas + marges
 mainWindow = Tk()
 mainWindow.title('Projet sudoku en python')
 mainWindow.minsize(width = largeurMainWindow, height = hauteurMainWindow)
+
+# Frame du header
+headerFrame = Frame(
+  mainWindow,
+  padx = 10,
+  pady = 10
+)
+headerFrame.pack(side = TOP)
 
 # Frame du plateau
 plateauFrame = Frame(
@@ -180,6 +201,13 @@ utilisateurFrame.pack(side = RIGHT)
 valeurUtilisateur = StringVar()
 caseCliqueeX = IntVar()
 caseCliqueeY = IntVar()
+
+# Remplissage du header
+titre = Label(headerFrame, text = 'SUDOKU')
+titre.pack(side = TOP)
+
+btnSauvegarderPartie = Button(headerFrame, text = 'Sauvegarder la partie dans un fichier .txt', command = sauvegarderPartie)
+btnSauvegarderPartie.pack(side = LEFT)
 
 # Canvas du plateau de jeu
 playGround = Canvas(
