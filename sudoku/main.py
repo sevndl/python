@@ -78,6 +78,9 @@ def affichageValeurs():
           text = valeurJeu,
           tag = ('valeur' + str(x) + str(y), etat)
         )
+      else:
+        precedentEtat = playGround.gettags('valeur' + str(x) + str(y))
+        playGround.delete('valeur' + str(x) + str(y))
 
 def inverserValeur(valeur):
   return valeur * -1
@@ -148,12 +151,23 @@ def sauvegarderPartie():
   grille = ''
   for x in range(1, tailleGrille + 1):
     for y in range(1, tailleGrille + 1):
-      valeurJeu = str(grilleDeJeu.getValeur(y, x))
+      valeurJeu = grilleDeJeu.getValeur(y, x)
+      if valeurJeu < 1:
+        valeurJeu = 0
+      valeurJeu = str(valeurJeu)
       grille += valeurJeu + ' ' if y < tailleGrille else valeurJeu + '\n'
   with open(sauvegardeFichier, 'w') as f:
     f.write(grille)
 
-
+# Fonction pour charger une partie depuis un fichier .txt
+def chargerPartie():
+  fichierACharger = filedialog.askopenfilename(
+    title = 'Charger une grille...',
+    defaultextension = 'txt',
+    filetypes = [('Text File', 'txt')])
+  chargerGrille(fichierACharger, grilleDeJeu)
+  affichageValeurs()
+  verifierGrille()
 
 ########## CODE PRINCIPAL ##########
 
@@ -195,7 +209,7 @@ utilisateurFrame = Frame(
   padx = 10,
   pady = 10
 )
-utilisateurFrame.pack(side = RIGHT)
+utilisateurFrame.pack(side = LEFT)
 
 # Déclaration des variables de contrôle
 valeurUtilisateur = StringVar()
@@ -208,6 +222,9 @@ titre.pack(side = TOP)
 
 btnSauvegarderPartie = Button(headerFrame, text = 'Sauvegarder la partie dans un fichier .txt', command = sauvegarderPartie)
 btnSauvegarderPartie.pack(side = LEFT)
+
+btnChargerPartie = Button(headerFrame, text = 'Charger une partie depuis un fichier .txt', command = chargerPartie)
+btnChargerPartie.pack(side = LEFT)
 
 # Canvas du plateau de jeu
 playGround = Canvas(
