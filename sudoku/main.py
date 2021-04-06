@@ -70,15 +70,19 @@ def affichageValeurs():
           elif precedentEtat == ('valeur' + str(x) + str(y), 'incorrect'):
             couleur = 'red'
             etat = 'incorrect'
-        playGround.delete('caseFocused')
-        playGround.create_text(
-          ((x * tailleCase) - (tailleCase / 2)) + 4,
-          ((y * tailleCase) - (tailleCase / 2)) + 4,
-          fill = couleur,
-          font = Font(size = 15, weight = 'normal'),
-          text = valeurJeu,
-          tag = ('valeur' + str(x) + str(y), etat)
-        )
+        if modeIndice.get():
+          playGround.delete('caseFocused')
+          return
+        else:
+          playGround.delete('caseFocused')
+          playGround.create_text(
+            ((x * tailleCase) - (tailleCase / 2)) + 4,
+            ((y * tailleCase) - (tailleCase / 2)) + 4,
+            fill = couleur,
+            font = Font(size = 15, weight = 'normal'),
+            text = valeurJeu,
+            tag = ('valeur' + str(x) + str(y), etat)
+          )
       else:
         precedentEtat = playGround.gettags('valeur' + str(x) + str(y))
         playGround.delete('valeur' + str(x) + str(y))
@@ -117,10 +121,17 @@ def verifierEntree(event):
   if valeurUtilisateur.get().isdigit():
     valeurAValider = int(valeurUtilisateur.get())
     if 1 <= valeurAValider <= 9:
-      grilleDeJeu.setValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()), valeurAValider)
+      # Ajout de la valeur dans la grille de jeu si on n'est pas en mode indice
+      if not modeIndice.get():
+        grilleDeJeu.setValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()), valeurAValider)
+      # Définition des tags selon le mode
+      tagPrefix = 'indice' if modeIndice.get() else 'valeur'
+      tagIndice = tagPrefix + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())) + str(valeurAValider)
+      tagValeur = (tagPrefix + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())), 'nonVerifie')
+      # Attribution du tag
       playGround.itemconfig(
-        'valeur' + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())),
-        tag = ('valeur' + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())), 'nonVerifie')
+        tagPrefix + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())),
+        tag = tagIndice if modeIndice.get() else tagValeur
       )
       affichageValeurs()
   entreeUtilisateur.delete(0, END)
