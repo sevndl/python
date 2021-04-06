@@ -70,6 +70,7 @@ def affichageValeurs():
           elif precedentEtat == ('valeur' + str(x) + str(y), 'incorrect'):
             couleur = 'red'
             etat = 'incorrect'
+        playGround.delete('caseFocused')
         playGround.create_text(
           ((x * tailleCase) - (tailleCase / 2)) + 4,
           ((y * tailleCase) - (tailleCase / 2)) + 4,
@@ -89,12 +90,25 @@ def inverserValeur(valeur):
 def nombreEstDansLaCase(event):
   caseCliqueeX.set(event.x)
   caseCliqueeY.set(event.y)
+  colonne = getColonne(caseCliqueeX.get())
+  ligne = getColonne(caseCliqueeY.get())
   entreeUtilisateur.delete(0, END)
-  if grilleVerifiee.getValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get())) <= 0:
+  if grilleVerifiee.getValeur(colonne, ligne) <= 0:
+    playGround.delete('caseFocused')
+    playGround.create_rectangle(
+      ((colonne - 1) * tailleCase) + 4,
+      ((ligne - 1) * tailleCase) + 4,
+      ((colonne * tailleCase)) + 4,
+      ((ligne * tailleCase)) + 4,
+      width = 3,
+      outline = 'blue',
+      tag = 'caseFocused'
+    )
     entreeUtilisateur.config(state = NORMAL)
     entreeUtilisateur.focus()
     entreeUtilisateur.bind('<Return>', verifierEntree)
   else:
+    playGround.delete('caseFocused')
     entreeUtilisateur.config(state = DISABLED)
     mainWindow.focus_set()
 
@@ -169,6 +183,11 @@ def chargerPartie():
   affichageValeurs()
   verifierGrille()
 
+# Fonction pour switcher de mode entre indice et valeur
+def switchModeIndice():
+  mode = False if modeIndice.get() == True else True
+  modeIndice.set(mode)
+
 ########## CODE PRINCIPAL ##########
 
 # Déclaration des variables
@@ -176,9 +195,9 @@ grilleInitiale = Sudoku(9)
 grilleVerifiee = Sudoku(9)
 grilleDeJeu = Sudoku(9)
 tailleGrille = grilleDeJeu.getTaille()
-tailleCase = 50
+tailleCase = 75
 tailleCanvas = (tailleGrille * tailleCase) + 4
-marges = 100
+marges = 300
 hauteurMainWindow = tailleCanvas
 largeurMainWindow = tailleCanvas + marges
 
@@ -215,16 +234,11 @@ utilisateurFrame.pack(side = LEFT)
 valeurUtilisateur = StringVar()
 caseCliqueeX = IntVar()
 caseCliqueeY = IntVar()
+modeIndice = BooleanVar(value = False)
 
 # Remplissage du header
 titre = Label(headerFrame, text = 'SUDOKU')
 titre.pack(side = TOP)
-
-btnSauvegarderPartie = Button(headerFrame, text = 'Sauvegarder la partie dans un fichier .txt', command = sauvegarderPartie)
-btnSauvegarderPartie.pack(side = LEFT)
-
-btnChargerPartie = Button(headerFrame, text = 'Charger une partie depuis un fichier .txt', command = chargerPartie)
-btnChargerPartie.pack(side = LEFT)
 
 # Canvas du plateau de jeu
 playGround = Canvas(
@@ -240,14 +254,26 @@ entreeUtilisateur = Entry(utilisateurFrame, textvariable = valeurUtilisateur)
 entreeUtilisateur.config(state = DISABLED)
 entreeUtilisateur.pack()
 
+# Bouton de switch entre le mode indices et le mode valeurs
+boutonSwitchIndiceValeur = Button(utilisateurFrame, text = 'Mode indice', command = switchModeIndice)
+boutonSwitchIndiceValeur.pack()
+
 # Bouton de vérification de la grille
 boutonVerification = Button(utilisateurFrame, text = 'Vérifier la grille', command = verifierGrille)
 boutonVerification.pack()
 
+# Bouton de sauvegarde de la partie dans un fichier .txt
+btnSauvegarderPartie = Button(utilisateurFrame, text = 'Sauvegarder la partie dans un fichier .txt', command = sauvegarderPartie)
+btnSauvegarderPartie.pack()
+
+# Bouton de chargement de la partie depuis un fichier .txt
+btnChargerPartie = Button(utilisateurFrame, text = 'Charger une partie depuis un fichier .txt', command = chargerPartie)
+btnChargerPartie.pack()
+
 # Affichage de la grille
-chargerGrille('sudoku/bordel.txt', grilleInitiale)
-chargerGrille('sudoku/bordel.txt', grilleVerifiee)
-chargerGrille('sudoku/bordel.txt', grilleDeJeu)
+chargerGrille('bordel.txt', grilleInitiale)
+chargerGrille('bordel.txt', grilleVerifiee)
+chargerGrille('bordel.txt', grilleDeJeu)
 affichageGrille()
 affichageValeurs()
 
