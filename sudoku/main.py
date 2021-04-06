@@ -100,8 +100,8 @@ def nombreEstDansLaCase(event):
       ((ligne - 1) * tailleCase) + 4,
       ((colonne * tailleCase)) + 4,
       ((ligne * tailleCase)) + 4,
-      width = 3,
-      outline = 'blue',
+      width = 2,
+      outline = '#8EC2F7',
       tag = 'caseFocused'
     )
     entreeUtilisateur.config(state = NORMAL)
