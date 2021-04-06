@@ -114,6 +114,9 @@ def nombreEstDansLaCase(event):
 
 # Fonction pour valider l'entrée de l'utilisateur à chaque case remplie
 def verifierEntree(event):
+  if valeurUtilisateur.get() == '':
+    playGround.delete('valeur' + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())))
+    playGround.delete('caseFocused')
   if valeurUtilisateur.get().isdigit():
     valeurAValider = int(valeurUtilisateur.get())
     if 1 <= valeurAValider <= 9:
