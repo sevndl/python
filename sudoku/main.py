@@ -118,6 +118,9 @@ def nombreEstDansLaCase(event):
 
 # Fonction pour valider l'entrée de l'utilisateur à chaque case remplie
 def verifierEntree(event):
+  if valeurUtilisateur.get() == '':
+    playGround.delete('valeur' + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())))
+    playGround.delete('caseFocused')
   if valeurUtilisateur.get().isdigit():
     valeurAValider = int(valeurUtilisateur.get())
     if 1 <= valeurAValider <= 9:
@@ -194,11 +197,6 @@ def chargerPartie():
   affichageValeurs()
   verifierGrille()
 
-# Fonction pour switcher de mode entre indice et valeur
-def switchModeIndice():
-  mode = not modeIndice.get()
-  modeIndice.set(mode)
-
 ########## CODE PRINCIPAL ##########
 
 # Déclaration des variables
@@ -250,7 +248,6 @@ utilisateurFrame.pack(side = LEFT)
 valeurUtilisateur = StringVar()
 caseCliqueeX = IntVar()
 caseCliqueeY = IntVar()
-modeIndice = BooleanVar(value = False)
 
 # Remplissage du header
 titre = Label(headerFrame, text = 'SUDOKU')
@@ -269,10 +266,6 @@ playGround.bind('<Button-1>', nombreEstDansLaCase)
 entreeUtilisateur = Entry(utilisateurFrame, textvariable = valeurUtilisateur)
 entreeUtilisateur.config(state = DISABLED)
 entreeUtilisateur.pack()
-
-# Bouton de switch entre le mode indices et le mode valeurs
-boutonSwitchIndiceValeur = Checkbutton(utilisateurFrame, text = 'Mode indice', command = switchModeIndice)
-boutonSwitchIndiceValeur.pack()
 
 # Bouton de vérification de la grille
 boutonVerification = Button(utilisateurFrame, text = 'Vérifier la grille', command = verifierGrille)
