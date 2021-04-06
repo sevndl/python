@@ -185,7 +185,7 @@ def chargerPartie():
 
 # Fonction pour switcher de mode entre indice et valeur
 def switchModeIndice():
-  mode = False if modeIndice.get() == True else True
+  mode = not modeIndice.get()
   modeIndice.set(mode)
 
 ########## CODE PRINCIPAL ##########
@@ -205,6 +205,11 @@ largeurMainWindow = tailleCanvas + marges
 mainWindow = Tk()
 mainWindow.title('Projet sudoku en python')
 mainWindow.minsize(width = largeurMainWindow, height = hauteurMainWindow)
+
+# Position initiale de la fenêtre au centre de l'écran
+largeurEcran = mainWindow.winfo_screenwidth()
+hauteurEcran = mainWindow.winfo_screenheight()
+mainWindow.geometry('+{}+{}'.format(int(largeurEcran / 2 - largeurMainWindow / 2), int(hauteurEcran / 2 - hauteurMainWindow / 2)))
 
 # Frame du header
 headerFrame = Frame(
@@ -255,7 +260,7 @@ entreeUtilisateur.config(state = DISABLED)
 entreeUtilisateur.pack()
 
 # Bouton de switch entre le mode indices et le mode valeurs
-boutonSwitchIndiceValeur = Button(utilisateurFrame, text = 'Mode indice', command = switchModeIndice)
+boutonSwitchIndiceValeur = Checkbutton(utilisateurFrame, text = 'Mode indice', command = switchModeIndice)
 boutonSwitchIndiceValeur.pack()
 
 # Bouton de vérification de la grille
