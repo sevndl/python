@@ -18,3 +18,7 @@ class Sudoku:
   def setValeur(self, colonne, ligne, valeur):
     if valeur <= self.getTaille():
       self.getGrille()[colonne - 1][ligne - 1] = valeur
+
+  def removeValeur(self, colonne, ligne):
+    if self.getValeur(colonne, ligne):
+      self.getGrille()[colonne - 1][ligne - 1] = 0

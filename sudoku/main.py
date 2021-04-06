@@ -55,8 +55,8 @@ def affichageValeurs():
       valeurVerifiee = grilleVerifiee.getValeur(x, y)
       valeurInitiale = grilleInitiale.getValeur(x, y)
       if valeurJeu > 0:
-        precedentEtat = playGround.gettags('valeur' + str(x) + str(y))
-        playGround.delete('valeur' + str(x) + str(y))
+        precedentEtat = playGround.gettags('valeur&' + str(x) + str(y))
+        playGround.delete('valeur&' + str(x) + str(y))
         if valeurJeu == valeurInitiale:
           couleur = 'black'
           etat = 'initial'
@@ -67,25 +67,24 @@ def affichageValeurs():
           if precedentEtat == () or precedentEtat[1] == 'nonVerifie':
             couleur = 'orange'
             etat = 'nonVerifie'
-          elif precedentEtat == ('valeur' + str(x) + str(y), 'incorrect'):
+          elif precedentEtat == ('valeur&' + str(x) + str(y), 'incorrect'):
             couleur = 'red'
             etat = 'incorrect'
+        playGround.delete('caseFocused')
         if modeIndice.get():
-          playGround.delete('caseFocused')
           return
         else:
-          playGround.delete('caseFocused')
           playGround.create_text(
             ((x * tailleCase) - (tailleCase / 2)) + 4,
             ((y * tailleCase) - (tailleCase / 2)) + 4,
             fill = couleur,
             font = Font(size = 15, weight = 'normal'),
             text = valeurJeu,
-            tag = ('valeur' + str(x) + str(y), etat)
+            tag = ('valeur&' + str(x) + str(y), etat)
           )
       else:
-        precedentEtat = playGround.gettags('valeur' + str(x) + str(y))
-        playGround.delete('valeur' + str(x) + str(y))
+        precedentEtat = playGround.gettags('valeur&' + str(x) + str(y))
+        playGround.delete('valeur&' + str(x) + str(y))
 
 def inverserValeur(valeur):
   return valeur * -1
@@ -119,7 +118,8 @@ def nombreEstDansLaCase(event):
 # Fonction pour valider l'entrée de l'utilisateur à chaque case remplie
 def verifierEntree(event):
   if valeurUtilisateur.get() == '':
-    playGround.delete('valeur' + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())))
+    playGround.delete('valeur&' + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())))
+    grilleDeJeu.removeValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()))
     playGround.delete('caseFocused')
   if valeurUtilisateur.get().isdigit():
     valeurAValider = int(valeurUtilisateur.get())
@@ -128,7 +128,7 @@ def verifierEntree(event):
       if not modeIndice.get():
         grilleDeJeu.setValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()), valeurAValider)
       # Définition des tags selon le mode
-      tagPrefix = 'indice' if modeIndice.get() else 'valeur'
+      tagPrefix = 'indice&' if modeIndice.get() else 'valeur&'
       tagIndice = tagPrefix + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())) + str(valeurAValider)
       tagValeur = (tagPrefix + str(getColonne(caseCliqueeX.get())) + str(getLigne(caseCliqueeY.get())), 'nonVerifie')
       # Attribution du tag
@@ -145,14 +145,14 @@ def verifierEntree(event):
 def verifierGrille():
   for x in range(1, tailleGrille + 1):
     for y in range(1, tailleGrille + 1):
-      precedentEtat = playGround.gettags('valeur' + str(x) + str(y))
-      if precedentEtat != ('valeur' + str(x) + str(y), 'correct'):
+      precedentEtat = playGround.gettags('valeur&' + str(x) + str(y))
+      if precedentEtat != ('valeur&' + str(x) + str(y), 'correct'):
         valeurJeu = grilleDeJeu.getValeur(x, y)
         valeurVerifiee = inverserValeur(grilleVerifiee.getValeur(x, y))
         if valeurJeu == valeurVerifiee:
           grilleVerifiee.setValeur(x, y, valeurJeu)
         else:
-          playGround.itemconfig('valeur' + str(x) + str(y), tag = ('valeur' + str(x) + str(y), 'incorrect'))
+          playGround.itemconfig('valeur&' + str(x) + str(y), tag = ('valeur&' + str(x) + str(y), 'incorrect'))
   affichageValeurs()
   if verificationPartieTerminee():
     boutonVerification.config(state = DISABLED)
@@ -248,6 +248,7 @@ utilisateurFrame.pack(side = LEFT)
 valeurUtilisateur = StringVar()
 caseCliqueeX = IntVar()
 caseCliqueeY = IntVar()
+modeIndice = BooleanVar(False)
 
 # Remplissage du header
 titre = Label(headerFrame, text = 'SUDOKU')
