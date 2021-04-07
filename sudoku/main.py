@@ -144,14 +144,19 @@ def nombreEstDansLaCase(event):
     )
     inputValeur.config(state = NORMAL)
     inputValeur.focus()
-    inputValeur.bind('<Return>', verifierIndice if modeIndice.get() else verifierEntree)
+    inputValeur.bind('<Return>', modeChecker)
   else:
     playGround.delete('caseFocused')
     inputValeur.config(state = DISABLED)
     mainWindow.focus_set()
 
+# Fonction qui redirige vers la bonne fonction selon le mode sélectionné au moment
+# de l'appui sur la touche Entrer
+def modeChecker(event):
+  verifierIndice() if modeIndice.get() else verifierEntree()
+
 # Fonction pour vérifier l'indice entré
-def verifierIndice(event):
+def verifierIndice():
   if valeurUtilisateur.get().isdigit():
     colonne = getColonne(caseCliqueeX.get())
     ligne = getLigne(caseCliqueeY.get())
@@ -167,7 +172,7 @@ def verifierIndice(event):
   mainWindow.focus_set()
 
 # Fonction pour valider l'entrée de l'utilisateur à chaque case remplie
-def verifierEntree(event):
+def verifierEntree():
   colonne = getColonne(caseCliqueeX.get())
   ligne = getLigne(caseCliqueeY.get())
   if valeurUtilisateur.get() == '':
