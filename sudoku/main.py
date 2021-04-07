@@ -71,6 +71,7 @@ def affichageValeurs():
             couleur = 'red'
             etat = 'incorrect'
         playGround.delete('caseFocused')
+        playGround.delete('indice&' + str(x) + '&' + str(y))
         playGround.create_text(
           ((x * tailleCase) - (tailleCase / 2)) + 4,
           ((y * tailleCase) - (tailleCase / 2)) + 4,
@@ -80,27 +81,7 @@ def affichageValeurs():
           tag = ('valeur&' + str(x) + '&' + str(y), etat)
         )
       else:
-        precedentEtat = playGround.gettags('valeur&' + str(x) + '&' + str(y))
         playGround.delete('valeur&' + str(x) + '&' + str(y))
-
-# # Fonction pour afficher le quadrillage des indices dans une case
-# def affichageQuadrillageIndices(colonne, ligne):
-#   # Lignes verticales
-#   for x in range(1, 3):
-#     playGround.create_line(
-#       ((colonne - 1) * tailleCase) + (x * (tailleCase / 3)) + 4,
-#       ((ligne - 1) * tailleCase) + 4,
-#       ((colonne - 1) * tailleCase) + (x * (tailleCase / 3)) + 4,
-#       ((ligne - 1) * tailleCase) + tailleCase + 4
-#     )
-#   # Lignes horizontales
-#   for y in range(1, 3):
-#     playGround.create_line(
-#       ((colonne - 1) * tailleCase) + 4,
-#       ((ligne - 1) * tailleCase) + (x * (tailleCase / 3)) + 4,
-#       ((colonne - 1) * tailleCase) + tailleCase + 4,
-#       ((ligne - 1) * tailleCase) + (x * (tailleCase / 3)) + 4
-#     )
 
 # Fonction pour afficher les indices
 def affichageIndice(colonne, ligne, valeur, tag):
@@ -150,7 +131,6 @@ def nombreEstDansLaCase(event):
   ligne = getColonne(caseCliqueeY.get())
   # On efface les champs de texte pour les valeurs / indices
   inputValeur.delete(0, END)
-  inputIndice.delete(0, END)
   if grilleVerifiee.getValeur(colonne, ligne) <= 0:
     playGround.delete('caseFocused')
     playGround.create_rectangle(
@@ -164,44 +144,45 @@ def nombreEstDansLaCase(event):
     )
     inputValeur.config(state = NORMAL)
     inputValeur.focus()
-    inputValeur.bind('<Return>', verifierEntree)
-    inputIndice.config(state = NORMAL)
-    inputIndice.focus()
-    inputIndice.bind('<Return>', verifierIndice)
+    inputValeur.bind('<Return>', verifierIndice if modeIndice.get() else verifierEntree)
   else:
     playGround.delete('caseFocused')
     inputValeur.config(state = DISABLED)
-    inputIndice.config(state = DISABLED)
     mainWindow.focus_set()
 
 # Fonction pour vérifier l'indice entré
 def verifierIndice(event):
-  if indiceUtilisateur.get().isdigit():
+  if valeurUtilisateur.get().isdigit():
     colonne = getColonne(caseCliqueeX.get())
     ligne = getLigne(caseCliqueeY.get())
-    valeurAValider = int(indiceUtilisateur.get())
+    valeurAValider = int(valeurUtilisateur.get())
+    playGround.delete('valeur&' + str(colonne) + '&' + str(ligne))
+    grilleDeJeu.removeValeur(colonne, ligne)
     tagPrefix = 'indice&'
     tagIndice = (tagPrefix + str(colonne) + '&' + str(ligne), str(valeurAValider))
     affichageIndice(colonne, ligne, valeurAValider, tagIndice)
-  inputIndice.delete(0, END)
-  inputIndice.config(state = DISABLED)
+  playGround.delete('caseFocused')
+  inputValeur.delete(0, END)
+  inputValeur.config(state = DISABLED)
   mainWindow.focus_set()
 
 # Fonction pour valider l'entrée de l'utilisateur à chaque case remplie
 def verifierEntree(event):
+  colonne = getColonne(caseCliqueeX.get())
+  ligne = getLigne(caseCliqueeY.get())
   if valeurUtilisateur.get() == '':
-    playGround.delete('valeur&' + str(getColonne(caseCliqueeX.get())) + '&' + str(getLigne(caseCliqueeY.get())))
-    grilleDeJeu.removeValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()))
+    playGround.delete('valeur&' + str(colonne) + '&' + str(ligne))
+    grilleDeJeu.removeValeur(colonne, ligne)
     playGround.delete('caseFocused')
   if valeurUtilisateur.get().isdigit():
     valeurAValider = int(valeurUtilisateur.get())
     if 1 <= valeurAValider <= 9:
-      grilleDeJeu.setValeur(getColonne(caseCliqueeX.get()), getLigne(caseCliqueeY.get()), valeurAValider)
+      grilleDeJeu.setValeur(colonne, ligne, valeurAValider)
       tagPrefix = 'valeur&'
-      tagValeur = (tagPrefix + str(getColonne(caseCliqueeX.get())) + '&' + str(getLigne(caseCliqueeY.get())), 'nonVerifie')
+      tagValeur = (tagPrefix + str(colonne) + '&' + str(ligne), 'nonVerifie')
       # Attribution du tag
       playGround.itemconfig(
-        tagPrefix + str(getColonne(caseCliqueeX.get())) + '&' + str(getLigne(caseCliqueeY.get())),
+        tagPrefix + str(colonne) + '&' + str(ligne),
         tag = tagValeur
       )
       affichageValeurs()
@@ -265,6 +246,10 @@ def chargerPartie():
   affichageValeurs()
   verifierGrille()
 
+# Fonction pour changer de mode
+def switchMode():
+  modeIndice.set(not modeIndice.get())
+
 ########## CODE PRINCIPAL ##########
 
 # Déclaration des variables
@@ -314,9 +299,9 @@ utilisateurFrame.pack(side = LEFT)
 
 # Déclaration des variables de contrôle
 valeurUtilisateur = StringVar()
-indiceUtilisateur = StringVar()
 caseCliqueeX = IntVar()
 caseCliqueeY = IntVar()
+modeIndice = BooleanVar(False)
 
 # Remplissage du header
 titre = Label(headerFrame, text = 'SUDOKU')
@@ -336,10 +321,9 @@ inputValeur = Entry(utilisateurFrame, textvariable = valeurUtilisateur)
 inputValeur.config(state = DISABLED)
 inputValeur.pack()
 
-# Champ d'entrée des indices
-inputIndice = Entry(utilisateurFrame, textvariable = indiceUtilisateur)
-inputIndice.config(state = DISABLED)
-inputIndice.pack()
+# Bouton de changement de mode (indice ou pas)
+boutonVerification = Checkbutton(utilisateurFrame, text = 'Mode indice', command = switchMode)
+boutonVerification.pack()
 
 # Bouton de vérification de la grille
 boutonVerification = Button(utilisateurFrame, text = 'Vérifier la grille', command = verifierGrille)
