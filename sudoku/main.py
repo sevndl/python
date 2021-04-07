@@ -71,7 +71,8 @@ def affichageValeurs():
             couleur = 'red'
             etat = 'incorrect'
         playGround.delete('caseFocused')
-        playGround.delete('indice&' + str(x) + '&' + str(y))
+        for i in range(1, 9 + 1):
+          playGround.delete('indice&' + str(x) + '&' + str(y) + '&' + str(i))
         playGround.create_text(
           ((x * tailleCase) - (tailleCase / 2)) + 4,
           ((y * tailleCase) - (tailleCase / 2)) + 4,
@@ -164,8 +165,18 @@ def verifierIndice():
     playGround.delete('valeur&' + str(colonne) + '&' + str(ligne))
     grilleDeJeu.removeValeur(colonne, ligne)
     tagPrefix = 'indice&'
-    tagIndice = (tagPrefix + str(colonne) + '&' + str(ligne), str(valeurAValider))
-    affichageIndice(colonne, ligne, valeurAValider, tagIndice)
+    tagIndice = (tagPrefix + str(colonne) + '&' + str(ligne) + '&' + str(valeurAValider))
+    tags = playGround.gettags(tagPrefix + str(colonne) + '&' + str(ligne) + '&' + str(valeurAValider))
+    indiceSupprime = False
+    if len(tags) > 0:
+      for tag in tags:
+        valeur = tag.split('&')[3]
+        if valeur == str(valeurAValider):
+          playGround.delete(tag)
+          indiceSupprime = True
+          break
+    if not indiceSupprime:
+      affichageIndice(colonne, ligne, valeurAValider, tagIndice)
   playGround.delete('caseFocused')
   inputValeur.delete(0, END)
   inputValeur.config(state = DISABLED)
