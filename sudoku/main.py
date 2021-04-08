@@ -4,8 +4,10 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter.font import Font
 from functools import partial
+from random import randint
 
 import math
+import glob
 
 ########## FONCTIONS ##########
 
@@ -116,7 +118,6 @@ def nombreEstDansLaCase(event):
   ligne = getColonne(caseCliqueeY.get())
 
   if grilleVerifiee.getValeur(colonne, ligne) <= 0:
-    valeursPossiblesDansCase(colonne, ligne)
     playGround.delete('caseFocused')
     playGround.create_rectangle(
       ((colonne - 1) * tailleCase) + 4,
@@ -185,6 +186,9 @@ def verifierEntree():
 # Fonction pour vérifier si la valeur de chaque case remplie est correcte
 def verifierGrille():
   if not verificationPartieTerminee():
+    caseVide.set(False)
+    playGround.delete('caseFocused')
+    mainWindow.focus_set()
     for x in range(1, tailleGrille + 1):
       for y in range(1, tailleGrille + 1):
         precedentEtat = playGround.gettags('valeur&' + str(x) + '&' + str(y))
@@ -201,6 +205,7 @@ def verifierGrille():
       boutonModeIndice.config(state = DISABLED)
       playGround.unbind('<Button-1>')
       playGround.delete('caseFocused')
+      global messageGagne
       messageGagne = Label(indiceFrame, text = 'Gagné !')
       messageGagne.pack(side = RIGHT)
 
@@ -246,6 +251,21 @@ def chargerPartie():
 # Fonction pour changer de mode
 def switchMode():
   modeIndice.set(not modeIndice.get())
+
+# Fonction qui charge une grille aléatoire
+def chargementGrilleAleatoire():
+  global numeroGrille
+  listeGrillesRepertoire = []
+  if partieTerminee.get():
+    messageGagne.destroy()
+  for fichierGrille in glob.glob('./*.txt'):
+    listeGrillesRepertoire.append(fichierGrille)
+  numeroGrille = randint(0, len(listeGrillesRepertoire) - 1)
+  chargerGrille(listeGrillesRepertoire[numeroGrille], grilleInitiale)
+  chargerGrille(listeGrillesRepertoire[numeroGrille], grilleVerifiee)
+  chargerGrille(listeGrillesRepertoire[numeroGrille], grilleDeJeu)
+  affichageGrille()
+  affichageValeurs()
 
 # Fonction qui cherche les valeurs possibles dans une case
 def valeursPossiblesDansCase(colonne, ligne):
@@ -338,6 +358,7 @@ partieTerminee = BooleanVar(False)
 barreDeMenus = tkinter.Menu(mainWindow)
 
 menuFichier = tkinter.Menu(barreDeMenus)
+menuFichier.add_command(label = 'Nouvelle partie', command = chargementGrilleAleatoire)
 menuFichier.add_command(label = 'Sauvegarder la partie...', command = sauvegarderPartie)
 menuFichier.add_command(label = 'Charger une partie...', command = chargerPartie)
 menuFichier.add_separator()
@@ -374,9 +395,9 @@ boutonModeIndice = Checkbutton(indiceFrame, text = 'Mode indice', command = swit
 boutonModeIndice.pack()
 
 # Affichage de la grille
-chargerGrille('bordel.txt', grilleInitiale)
-chargerGrille('bordel.txt', grilleVerifiee)
-chargerGrille('bordel.txt', grilleDeJeu)
+chargerGrille('grille2.txt', grilleInitiale)
+chargerGrille('grille2.txt', grilleVerifiee)
+chargerGrille('grille2.txt', grilleDeJeu)
 affichageGrille()
 affichageValeurs()
 
