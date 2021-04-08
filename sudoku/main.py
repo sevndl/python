@@ -1,7 +1,8 @@
-from tkinter.font import Font
+import tkinter
 from Sudoku import *
 from tkinter import *
 from tkinter import filedialog
+from tkinter.font import Font
 
 import math
 
@@ -71,13 +72,13 @@ def affichageValeurs():
             couleur = 'red'
             etat = 'incorrect'
         playGround.delete('caseFocused')
-        for i in range(1, 9 + 1):
+        for i in range(1, tailleGrille + 1):
           playGround.delete('indice&' + str(x) + '&' + str(y) + '&' + str(i))
         playGround.create_text(
           ((x * tailleCase) - (tailleCase / 2)) + 4,
           ((y * tailleCase) - (tailleCase / 2)) + 4,
           fill = couleur,
-          font = Font(size = 15, weight = 'normal'),
+          font = Font(size = 20, weight = 'normal'),
           text = valeurJeu,
           tag = ('valeur&' + str(x) + '&' + str(y), etat)
         )
@@ -130,9 +131,11 @@ def nombreEstDansLaCase(event):
   caseCliqueeY.set(event.y)
   colonne = getColonne(caseCliqueeX.get())
   ligne = getColonne(caseCliqueeY.get())
+
   # On efface les champs de texte pour les valeurs / indices
   inputValeur.delete(0, END)
   if grilleVerifiee.getValeur(colonne, ligne) <= 0:
+    valeursPossiblesDansCase(colonne, ligne)
     playGround.delete('caseFocused')
     playGround.create_rectangle(
       ((colonne - 1) * tailleCase) + 4,
@@ -220,9 +223,9 @@ def verifierGrille():
           playGround.itemconfig('valeur&' + str(x) + '&' + str(y), tag = ('valeur&' + str(x) + '&' + str(y), 'incorrect'))
   affichageValeurs()
   if verificationPartieTerminee():
-    boutonVerification.config(state = DISABLED)
+    boutonModeIndice.config(state = DISABLED)
     inputValeur.config(state = DISABLED)
-    messageGagne = Label(utilisateurFrame, text = 'Gagné !')
+    messageGagne = Label(inputFrame, text = 'Gagné !')
     messageGagne.pack()
 
 # Fonction pour vérifier si la partie est terminée
@@ -241,16 +244,17 @@ def sauvegarderPartie():
     title = 'Enregistrer sous...',
     defaultextension = 'txt',
     filetypes = [('Text File', 'txt')])
-  grille = ''
-  for x in range(1, tailleGrille + 1):
-    for y in range(1, tailleGrille + 1):
-      valeurJeu = grilleDeJeu.getValeur(y, x)
-      if valeurJeu < 1:
-        valeurJeu = 0
-      valeurJeu = str(valeurJeu)
-      grille += valeurJeu + ' ' if y < tailleGrille else valeurJeu + '\n'
-  with open(sauvegardeFichier, 'w') as f:
-    f.write(grille)
+  if sauvegardeFichier != '':
+    grille = ''
+    for x in range(1, tailleGrille + 1):
+      for y in range(1, tailleGrille + 1):
+        valeurJeu = grilleDeJeu.getValeur(y, x)
+        if valeurJeu < 1:
+          valeurJeu = 0
+        valeurJeu = str(valeurJeu)
+        grille += valeurJeu + ' ' if y < tailleGrille else valeurJeu + '\n'
+    with open(sauvegardeFichier, 'w') as f:
+      f.write(grille)
 
 # Fonction pour charger une partie depuis un fichier .txt
 def chargerPartie():
@@ -258,13 +262,34 @@ def chargerPartie():
     title = 'Charger une grille...',
     defaultextension = 'txt',
     filetypes = [('Text File', 'txt')])
-  chargerGrille(fichierACharger, grilleDeJeu)
-  affichageValeurs()
-  verifierGrille()
+  if fichierACharger != '':
+    chargerGrille(fichierACharger, grilleDeJeu)
+    affichageValeurs()
+    verifierGrille()
 
 # Fonction pour changer de mode
 def switchMode():
   modeIndice.set(not modeIndice.get())
+
+# Fonction qui cherche les valeurs possibles dans une case
+def valeursPossiblesDansCase(colonne, ligne):
+  valeursLigne = []
+  valeursColonne = grilleDeJeu.getGrille()[colonne - 1]
+  valeursCarre = []
+  valeursPossibles = []
+
+  for x in range(1, tailleGrille + 1):
+    valeursLigne.append(grilleDeJeu.getValeur(x, ligne))
+
+  # for val in valeursColonne:
+  #   if val <= 0:
+  #     valeursColonne.pop(val)
+  # for val in valeursLigne:
+  #   if val <= 0:
+  #     valeursLigne.pop(val)
+
+  print(valeursColonne)
+  print(valeursLigne)
 
 ########## CODE PRINCIPAL ##########
 
@@ -275,14 +300,16 @@ grilleDeJeu = Sudoku(9)
 tailleGrille = grilleDeJeu.getTaille()
 tailleCase = 75
 tailleCanvas = (tailleGrille * tailleCase) + 4
-marges = 300
-hauteurMainWindow = tailleCanvas
-largeurMainWindow = tailleCanvas + marges
+margesX = 40
+margesY = 150
+hauteurMainWindow = tailleCanvas + margesY
+largeurMainWindow = tailleCanvas + margesX
 
 # Fenêtre principale
 mainWindow = Tk()
 mainWindow.title('Projet sudoku en python')
 mainWindow.minsize(width = largeurMainWindow, height = hauteurMainWindow)
+mainWindow.maxsize(width = largeurMainWindow, height = hauteurMainWindow)
 
 # Position initiale de la fenêtre au centre de l'écran
 largeurEcran = mainWindow.winfo_screenwidth()
@@ -303,21 +330,39 @@ plateauFrame = Frame(
   padx = 10,
   pady = 10
 )
-plateauFrame.pack(side = LEFT)
+plateauFrame.pack(side = TOP)
 
 # Frame des contrôles utilisateur
-utilisateurFrame = Frame(
+inputFrame = Frame(
   mainWindow,
-  padx = 10,
-  pady = 10
+  width = 360,
+  height = 30
 )
-utilisateurFrame.pack(side = LEFT)
+inputFrame.pack()
+inputFrame.pack_propagate(0)
+inputFrame.place(x = margesX / 2, y = hauteurMainWindow - 60)
 
 # Déclaration des variables de contrôle
 valeurUtilisateur = StringVar()
 caseCliqueeX = IntVar()
 caseCliqueeY = IntVar()
 modeIndice = BooleanVar(False)
+
+# Mise en place de la barre de menus
+barreDeMenus = tkinter.Menu(mainWindow)
+
+menuFichier = tkinter.Menu(barreDeMenus)
+menuFichier.add_command(label = 'Sauvegarder la partie...', command = sauvegarderPartie)
+menuFichier.add_command(label = 'Charger une partie...', command = chargerPartie)
+menuFichier.add_separator()
+menuFichier.add_command(label = 'Quitter', command = mainWindow.quit)
+
+optionsMenu = tkinter.Menu(mainWindow)
+optionsMenu.add_command(label = 'Vérifier la grille', command = verifierGrille)
+
+barreDeMenus.add_cascade(label = 'Fichier', menu = menuFichier)
+barreDeMenus.add_cascade(label = 'Options', menu = optionsMenu)
+mainWindow.config(menu = barreDeMenus)
 
 # Remplissage du header
 titre = Label(headerFrame, text = 'SUDOKU')
@@ -329,29 +374,19 @@ playGround = Canvas(
   height = tailleCanvas,
   width = tailleCanvas
 )
-playGround.pack(side = LEFT)
+playGround.pack(side = TOP)
 playGround.bind('<Button-1>', nombreEstDansLaCase)
 
 # Champ d'entrée des valeurs
-inputValeur = Entry(utilisateurFrame, textvariable = valeurUtilisateur)
+label = Label(inputFrame, text = 'Valeur :')
+label.pack(side = LEFT)
+inputValeur = Entry(inputFrame, textvariable = valeurUtilisateur)
 inputValeur.config(state = DISABLED)
-inputValeur.pack()
+inputValeur.pack(side = LEFT)
 
 # Bouton de changement de mode (indice ou pas)
-boutonVerification = Checkbutton(utilisateurFrame, text = 'Mode indice', command = switchMode)
-boutonVerification.pack()
-
-# Bouton de vérification de la grille
-boutonVerification = Button(utilisateurFrame, text = 'Vérifier la grille', command = verifierGrille)
-boutonVerification.pack()
-
-# Bouton de sauvegarde de la partie dans un fichier .txt
-btnSauvegarderPartie = Button(utilisateurFrame, text = 'Sauvegarder la partie dans un fichier .txt', command = sauvegarderPartie)
-btnSauvegarderPartie.pack()
-
-# Bouton de chargement de la partie depuis un fichier .txt
-btnChargerPartie = Button(utilisateurFrame, text = 'Charger une partie depuis un fichier .txt', command = chargerPartie)
-btnChargerPartie.pack()
+boutonModeIndice = Checkbutton(inputFrame, text = 'Mode indice', command = switchMode)
+boutonModeIndice.pack(side = RIGHT)
 
 # Affichage de la grille
 chargerGrille('bordel.txt', grilleInitiale)
