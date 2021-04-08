@@ -3,6 +3,7 @@ from Sudoku import *
 from tkinter import *
 from tkinter import filedialog
 from tkinter.font import Font
+from functools import partial
 
 import math
 
@@ -71,7 +72,6 @@ def affichageValeurs():
           elif precedentEtat == ('valeur&' + str(x) + '&' + str(y), 'incorrect'):
             couleur = 'red'
             etat = 'incorrect'
-        playGround.delete('caseFocused')
         for i in range(1, tailleGrille + 1):
           playGround.delete('indice&' + str(x) + '&' + str(y) + '&' + str(i))
         playGround.create_text(
@@ -132,8 +132,6 @@ def nombreEstDansLaCase(event):
   colonne = getColonne(caseCliqueeX.get())
   ligne = getColonne(caseCliqueeY.get())
 
-  # On efface les champs de texte pour les valeurs / indices
-  inputValeur.delete(0, END)
   if grilleVerifiee.getValeur(colonne, ligne) <= 0:
     valeursPossiblesDansCase(colonne, ligne)
     playGround.delete('caseFocused')
@@ -146,43 +144,39 @@ def nombreEstDansLaCase(event):
       outline = '#8EC2F7',
       tag = 'caseFocused'
     )
-    inputValeur.config(state = NORMAL)
-    inputValeur.focus()
-    inputValeur.bind('<Return>', modeChecker)
+    caseVide.set(True)
   else:
     playGround.delete('caseFocused')
-    inputValeur.config(state = DISABLED)
     mainWindow.focus_set()
+    caseVide.set(False)
 
 # Fonction qui redirige vers la bonne fonction selon le mode sélectionné au moment
 # de l'appui sur la touche Entrer
-def modeChecker(event):
-  verifierIndice() if modeIndice.get() else verifierEntree()
+def modeChecker(valeur):
+  if caseVide.get():
+    valeurUtilisateur.set(valeur)
+    verifierIndice() if modeIndice.get() else verifierEntree()
 
 # Fonction pour vérifier l'indice entré
 def verifierIndice():
-  if valeurUtilisateur.get().isdigit():
-    colonne = getColonne(caseCliqueeX.get())
-    ligne = getLigne(caseCliqueeY.get())
-    valeurAValider = int(valeurUtilisateur.get())
-    playGround.delete('valeur&' + str(colonne) + '&' + str(ligne))
-    grilleDeJeu.removeValeur(colonne, ligne)
-    tagPrefix = 'indice&'
-    tagIndice = (tagPrefix + str(colonne) + '&' + str(ligne) + '&' + str(valeurAValider))
-    tags = playGround.gettags(tagPrefix + str(colonne) + '&' + str(ligne) + '&' + str(valeurAValider))
-    indiceSupprime = False
-    if len(tags) > 0:
-      for tag in tags:
-        valeur = tag.split('&')[3]
-        if valeur == str(valeurAValider):
-          playGround.delete(tag)
-          indiceSupprime = True
-          break
-    if not indiceSupprime:
-      affichageIndice(colonne, ligne, valeurAValider, tagIndice)
-  playGround.delete('caseFocused')
-  inputValeur.delete(0, END)
-  inputValeur.config(state = DISABLED)
+  colonne = getColonne(caseCliqueeX.get())
+  ligne = getLigne(caseCliqueeY.get())
+  valeurAValider = int(valeurUtilisateur.get())
+  playGround.delete('valeur&' + str(colonne) + '&' + str(ligne))
+  grilleDeJeu.removeValeur(colonne, ligne)
+  tagPrefix = 'indice&'
+  tagIndice = (tagPrefix + str(colonne) + '&' + str(ligne) + '&' + str(valeurAValider))
+  tags = playGround.gettags(tagPrefix + str(colonne) + '&' + str(ligne) + '&' + str(valeurAValider))
+  indiceSupprime = False
+  if len(tags) > 0:
+    for tag in tags:
+      valeur = tag.split('&')[3]
+      if valeur == str(valeurAValider):
+        playGround.delete(tag)
+        indiceSupprime = True
+        break
+  if not indiceSupprime:
+    affichageIndice(colonne, ligne, valeurAValider, tagIndice)
   mainWindow.focus_set()
 
 # Fonction pour valider l'entrée de l'utilisateur à chaque case remplie
@@ -192,22 +186,17 @@ def verifierEntree():
   if valeurUtilisateur.get() == '':
     playGround.delete('valeur&' + str(colonne) + '&' + str(ligne))
     grilleDeJeu.removeValeur(colonne, ligne)
-    playGround.delete('caseFocused')
-  if valeurUtilisateur.get().isdigit():
-    valeurAValider = int(valeurUtilisateur.get())
-    if 1 <= valeurAValider <= 9:
-      grilleDeJeu.setValeur(colonne, ligne, valeurAValider)
-      tagPrefix = 'valeur&'
-      tagValeur = (tagPrefix + str(colonne) + '&' + str(ligne), 'nonVerifie')
-      # Attribution du tag
-      playGround.itemconfig(
-        tagPrefix + str(colonne) + '&' + str(ligne),
-        tag = tagValeur
-      )
-      affichageValeurs()
-  inputValeur.delete(0, END)
-  inputValeur.config(state = DISABLED)
-  mainWindow.focus_set()
+  valeurAValider = int(valeurUtilisateur.get())
+  if 1 <= valeurAValider <= 9:
+    grilleDeJeu.setValeur(colonne, ligne, valeurAValider)
+    tagPrefix = 'valeur&'
+    tagValeur = (tagPrefix + str(colonne) + '&' + str(ligne), 'nonVerifie')
+    # Attribution du tag
+    playGround.itemconfig(
+      tagPrefix + str(colonne) + '&' + str(ligne),
+      tag = tagValeur
+    )
+    affichageValeurs()
 
 # Fonction pour vérifier si la valeur de chaque case remplie est correcte
 def verifierGrille():
@@ -224,7 +213,6 @@ def verifierGrille():
   affichageValeurs()
   if verificationPartieTerminee():
     boutonModeIndice.config(state = DISABLED)
-    inputValeur.config(state = DISABLED)
     messageGagne = Label(inputFrame, text = 'Gagné !')
     messageGagne.pack()
 
@@ -335,7 +323,7 @@ plateauFrame.pack(side = TOP)
 # Frame des contrôles utilisateur
 inputFrame = Frame(
   mainWindow,
-  width = 360,
+  width = tailleGrille * 45,
   height = 30
 )
 inputFrame.pack()
@@ -347,6 +335,7 @@ valeurUtilisateur = StringVar()
 caseCliqueeX = IntVar()
 caseCliqueeY = IntVar()
 modeIndice = BooleanVar(False)
+caseVide = BooleanVar(False)
 
 # Mise en place de la barre de menus
 barreDeMenus = tkinter.Menu(mainWindow)
@@ -380,9 +369,8 @@ playGround.bind('<Button-1>', nombreEstDansLaCase)
 # Champ d'entrée des valeurs
 label = Label(inputFrame, text = 'Valeur :')
 label.pack(side = LEFT)
-inputValeur = Entry(inputFrame, textvariable = valeurUtilisateur)
-inputValeur.config(state = DISABLED)
-inputValeur.pack(side = LEFT)
+for i in range(1, tailleGrille + 1):
+  Button(inputFrame, command = partial(modeChecker, i), text = i, padx = 5, pady = 5).pack(side = LEFT) 
 
 # Bouton de changement de mode (indice ou pas)
 boutonModeIndice = Checkbutton(inputFrame, text = 'Mode indice', command = switchMode)
