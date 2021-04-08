@@ -78,7 +78,7 @@ def affichageValeurs():
           ((x * tailleCase) - (tailleCase / 2)) + 4,
           ((y * tailleCase) - (tailleCase / 2)) + 4,
           fill = couleur,
-          font = Font(size = 20, weight = 'normal'),
+          font = Font(size = int(taillePoliceValeurs), weight = 'normal'),
           text = valeurJeu,
           tag = ('valeur&' + str(x) + '&' + str(y), etat)
         )
@@ -87,39 +87,22 @@ def affichageValeurs():
 
 # Fonction pour afficher les indices
 def affichageIndice(colonne, ligne, valeur, tag):
-  if valeur == 1:
-    colonne = ((colonne - 1) * tailleCase) + (tailleCase / math.sqrt(tailleGrille)) / 2
-    ligne = ((ligne - 1) * tailleCase) + (tailleCase / math.sqrt(tailleGrille)) / 2
-  if valeur == 2:
-    colonne = ((colonne - 1) * tailleCase) + 3 * ((tailleCase / math.sqrt(tailleGrille)) / 2)
-    ligne = ((ligne - 1) * tailleCase) + ((tailleCase / math.sqrt(tailleGrille)) / 2)
-  if valeur == 3:
-    colonne = (colonne * tailleCase) - (tailleCase / math.sqrt(tailleGrille)) / 2
-    ligne = ((ligne - 1) * tailleCase) + ((tailleCase / math.sqrt(tailleGrille)) / 2)
-  if valeur == 4:
-    colonne = ((colonne - 1) * tailleCase) + (tailleCase / math.sqrt(tailleGrille)) / 2
-    ligne = ((ligne - 1) * tailleCase) + 3 * (tailleCase / math.sqrt(tailleGrille)) / 2
-  if valeur == 5:
-    colonne = ((colonne - 1) * tailleCase) + 3 * ((tailleCase / math.sqrt(tailleGrille)) / 2)
-    ligne = ((ligne - 1) * tailleCase) + 3 * ((tailleCase / math.sqrt(tailleGrille)) / 2)
-  if valeur == 6:
-    colonne = (colonne * tailleCase) - (tailleCase / math.sqrt(tailleGrille)) / 2
-    ligne = (ligne * tailleCase) - 3 * (tailleCase / math.sqrt(tailleGrille)) / 2
-  if valeur == 7:
-    colonne = ((colonne - 1) * tailleCase) + (tailleCase / math.sqrt(tailleGrille)) / 2
-    ligne = ((ligne) * tailleCase) - (tailleCase / math.sqrt(tailleGrille)) / 2
-  if valeur == 8:
-    colonne = ((colonne - 1) * tailleCase) + 3 * ((tailleCase / math.sqrt(tailleGrille)) / 2)
-    ligne = ((ligne) * tailleCase) - ((tailleCase / math.sqrt(tailleGrille)) / 2)
-  if valeur == 9:
-    colonne = (colonne * tailleCase) - (tailleCase / math.sqrt(tailleGrille)) / 2
-    ligne = (ligne * tailleCase) - (tailleCase / math.sqrt(tailleGrille)) / 2
+  portionCase = tailleCase // math.sqrt(tailleGrille)
+  if valeur % math.sqrt(tailleGrille) == 0:
+    niveauColonne = math.sqrt(tailleGrille)
+    niveauLigne = valeur // math.sqrt(tailleGrille)
+  else:
+    niveauColonne = valeur % math.sqrt(tailleGrille)
+    niveauLigne = valeur // math.sqrt(tailleGrille) + 1
+  colonne = ((colonne - 1) * tailleCase) + ((niveauColonne * portionCase) - (portionCase / 2))
+  ligne = ((ligne - 1) * tailleCase) + ((niveauLigne * portionCase) - (portionCase / 2))
   playGround.create_text(
     colonne + 2,
     ligne + 2,
     text = valeur,
     tag = tag,
-    fill = 'grey'
+    fill = 'grey',
+    font = Font(size = int(taillePoliceIndices), weight = 'normal'),
   )
 
 def inverserValeur(valeur):
@@ -153,9 +136,10 @@ def nombreEstDansLaCase(event):
 # Fonction qui redirige vers la bonne fonction selon le mode sélectionné au moment
 # de l'appui sur la touche Entrer
 def modeChecker(valeur):
-  if caseVide.get():
-    valeurUtilisateur.set(valeur)
-    verifierIndice() if modeIndice.get() else verifierEntree()
+  if not partieTerminee.get():
+    if caseVide.get():
+      valeurUtilisateur.set(valeur)
+      verifierIndice() if modeIndice.get() else verifierEntree()
 
 # Fonction pour vérifier l'indice entré
 def verifierIndice():
@@ -187,7 +171,7 @@ def verifierEntree():
     playGround.delete('valeur&' + str(colonne) + '&' + str(ligne))
     grilleDeJeu.removeValeur(colonne, ligne)
   valeurAValider = int(valeurUtilisateur.get())
-  if 1 <= valeurAValider <= 9:
+  if 1 <= valeurAValider <= tailleGrille:
     grilleDeJeu.setValeur(colonne, ligne, valeurAValider)
     tagPrefix = 'valeur&'
     tagValeur = (tagPrefix + str(colonne) + '&' + str(ligne), 'nonVerifie')
@@ -200,21 +184,25 @@ def verifierEntree():
 
 # Fonction pour vérifier si la valeur de chaque case remplie est correcte
 def verifierGrille():
-  for x in range(1, tailleGrille + 1):
-    for y in range(1, tailleGrille + 1):
-      precedentEtat = playGround.gettags('valeur&' + str(x) + '&' + str(y))
-      if precedentEtat != ('valeur&' + str(x) + '&' + str(y), 'correct'):
-        valeurJeu = grilleDeJeu.getValeur(x, y)
-        valeurVerifiee = inverserValeur(grilleVerifiee.getValeur(x, y))
-        if valeurJeu == valeurVerifiee:
-          grilleVerifiee.setValeur(x, y, valeurJeu)
-        else:
-          playGround.itemconfig('valeur&' + str(x) + '&' + str(y), tag = ('valeur&' + str(x) + '&' + str(y), 'incorrect'))
-  affichageValeurs()
-  if verificationPartieTerminee():
-    boutonModeIndice.config(state = DISABLED)
-    messageGagne = Label(inputFrame, text = 'Gagné !')
-    messageGagne.pack()
+  if not verificationPartieTerminee():
+    for x in range(1, tailleGrille + 1):
+      for y in range(1, tailleGrille + 1):
+        precedentEtat = playGround.gettags('valeur&' + str(x) + '&' + str(y))
+        if precedentEtat != ('valeur&' + str(x) + '&' + str(y), 'correct'):
+          valeurJeu = grilleDeJeu.getValeur(x, y)
+          valeurVerifiee = inverserValeur(grilleVerifiee.getValeur(x, y))
+          if valeurJeu == valeurVerifiee:
+            grilleVerifiee.setValeur(x, y, valeurJeu)
+          else:
+            playGround.itemconfig('valeur&' + str(x) + '&' + str(y), tag = ('valeur&' + str(x) + '&' + str(y), 'incorrect'))
+    affichageValeurs()
+    verificationPartieTerminee()
+    if partieTerminee.get():
+      boutonModeIndice.config(state = DISABLED)
+      playGround.unbind('<Button-1>')
+      playGround.delete('caseFocused')
+      messageGagne = Label(indiceFrame, text = 'Gagné !')
+      messageGagne.pack(side = RIGHT)
 
 # Fonction pour vérifier si la partie est terminée
 def verificationPartieTerminee():
@@ -224,7 +212,7 @@ def verificationPartieTerminee():
       valeurCaseCourante = grilleVerifiee.getValeur(x, y)
       if valeurCaseCourante <= 0:
         casesRestantes += 1
-  return True if casesRestantes == 0 else False
+  partieTerminee.set(True if casesRestantes == 0 else False)
 
 # Fonction pour sauvegarder la partie dans un fichier .txt
 def sauvegarderPartie():
@@ -276,8 +264,8 @@ def valeursPossiblesDansCase(colonne, ligne):
   #   if val <= 0:
   #     valeursLigne.pop(val)
 
-  print(valeursColonne)
-  print(valeursLigne)
+  # print(valeursColonne)
+  # print(valeursLigne)
 
 ########## CODE PRINCIPAL ##########
 
@@ -286,8 +274,10 @@ grilleInitiale = Sudoku(9)
 grilleVerifiee = Sudoku(9)
 grilleDeJeu = Sudoku(9)
 tailleGrille = grilleDeJeu.getTaille()
-tailleCase = 75
+tailleCase = 100 - (tailleGrille * 3)
 tailleCanvas = (tailleGrille * tailleCase) + 4
+taillePoliceValeurs = tailleCase / 4
+taillePoliceIndices = taillePoliceValeurs / 2
 margesX = 40
 margesY = 150
 hauteurMainWindow = tailleCanvas + margesY
@@ -323,12 +313,18 @@ plateauFrame.pack(side = TOP)
 # Frame des contrôles utilisateur
 inputFrame = Frame(
   mainWindow,
-  width = tailleGrille * 45,
-  height = 30
+  padx = 10,
+  pady = 10
 )
-inputFrame.pack()
-inputFrame.pack_propagate(0)
-inputFrame.place(x = margesX / 2, y = hauteurMainWindow - 60)
+inputFrame.pack(side = LEFT)
+
+# Frame du mode indice
+indiceFrame = Frame(
+  mainWindow,
+  padx = 10,
+  pady = 10
+)
+indiceFrame.pack(side = LEFT)
 
 # Déclaration des variables de contrôle
 valeurUtilisateur = StringVar()
@@ -336,6 +332,7 @@ caseCliqueeX = IntVar()
 caseCliqueeY = IntVar()
 modeIndice = BooleanVar(False)
 caseVide = BooleanVar(False)
+partieTerminee = BooleanVar(False)
 
 # Mise en place de la barre de menus
 barreDeMenus = tkinter.Menu(mainWindow)
@@ -373,8 +370,8 @@ for i in range(1, tailleGrille + 1):
   Button(inputFrame, command = partial(modeChecker, i), text = i, padx = 5, pady = 5).pack(side = LEFT) 
 
 # Bouton de changement de mode (indice ou pas)
-boutonModeIndice = Checkbutton(inputFrame, text = 'Mode indice', command = switchMode)
-boutonModeIndice.pack(side = RIGHT)
+boutonModeIndice = Checkbutton(indiceFrame, text = 'Mode indice', command = switchMode)
+boutonModeIndice.pack()
 
 # Affichage de la grille
 chargerGrille('bordel.txt', grilleInitiale)
