@@ -2,12 +2,13 @@ import tkinter
 from Sudoku import *
 from tkinter import *
 from tkinter import filedialog
+from tkinter import messagebox
 from tkinter.font import Font
 from functools import partial
-from random import randint
 
 import math
 import glob
+import random
 
 ########## FONCTIONS ##########
 
@@ -223,6 +224,7 @@ def verificationPartieTerminee():
 def sauvegarderPartie():
   sauvegardeFichier = filedialog.asksaveasfilename(
     title = 'Enregistrer sous...',
+    initialfile = 'partie.' + grilleAleatoire,
     defaultextension = 'txt',
     filetypes = [('Text File', 'txt')])
   if sauvegardeFichier != '':
@@ -243,10 +245,12 @@ def chargerPartie():
     title = 'Charger une grille...',
     defaultextension = 'txt',
     filetypes = [('Text File', 'txt')])
-  if fichierACharger != '':
+  if fichierACharger != '' and fichierACharger.split('/')[-1] == 'partie.' + grilleAleatoire:
     chargerGrille(fichierACharger, grilleDeJeu)
     affichageValeurs()
     verifierGrille()
+  else:
+    messagebox.showerror(title = 'Erreur', message = 'La partie sélectionnée n\'est pas reconnue ou ne correspond pas à la partie en cours.')
 
 # Fonction pour changer de mode
 def switchMode():
@@ -254,16 +258,16 @@ def switchMode():
 
 # Fonction qui charge une grille aléatoire
 def chargementGrilleAleatoire():
-  global numeroGrille
+  global grilleAleatoire
   listeGrillesRepertoire = []
   if partieTerminee.get():
     messageGagne.destroy()
-  for fichierGrille in glob.glob('./*.txt'):
+  for fichierGrille in glob.glob('*.txt'):
     listeGrillesRepertoire.append(fichierGrille)
-  numeroGrille = randint(0, len(listeGrillesRepertoire) - 1)
-  chargerGrille(listeGrillesRepertoire[numeroGrille], grilleInitiale)
-  chargerGrille(listeGrillesRepertoire[numeroGrille], grilleVerifiee)
-  chargerGrille(listeGrillesRepertoire[numeroGrille], grilleDeJeu)
+  grilleAleatoire = random.choice(listeGrillesRepertoire)
+  chargerGrille(grilleAleatoire, grilleInitiale)
+  chargerGrille(grilleAleatoire, grilleVerifiee)
+  chargerGrille(grilleAleatoire, grilleDeJeu)
   affichageGrille()
   affichageValeurs()
   playGround.bind('<Button-1>', nombreEstDansLaCase)
