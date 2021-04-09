@@ -266,6 +266,9 @@ def chargementGrilleAleatoire():
   chargerGrille(listeGrillesRepertoire[numeroGrille], grilleDeJeu)
   affichageGrille()
   affichageValeurs()
+  playGround.bind('<Button-1>', nombreEstDansLaCase)
+  boutonModeIndice.config(state = NORMAL)
+  partieTerminee.set(False)
 
 # Fonction qui cherche les valeurs possibles dans une case
 def valeursPossiblesDansCase(colonne, ligne):
