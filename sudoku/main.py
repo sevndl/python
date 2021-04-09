@@ -385,7 +385,6 @@ playGround = Canvas(
   width = tailleCanvas
 )
 playGround.pack(side = TOP)
-playGround.bind('<Button-1>', nombreEstDansLaCase)
 
 # Champ d'entrée des valeurs
 label = Label(inputFrame, text = 'Valeur :')
@@ -398,11 +397,7 @@ boutonModeIndice = Checkbutton(indiceFrame, text = 'Mode indice', command = swit
 boutonModeIndice.pack()
 
 # Affichage de la grille
-chargerGrille('grille2.txt', grilleInitiale)
-chargerGrille('grille2.txt', grilleVerifiee)
-chargerGrille('grille2.txt', grilleDeJeu)
-affichageGrille()
-affichageValeurs()
+chargementGrilleAleatoire()
 
 # Affichage de la fenêtre principale,
 # et intrinsèquement des éléments graphiques la composant
