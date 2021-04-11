@@ -1,3 +1,5 @@
+from os import times
+from time import time
 import tkinter
 from Sudoku import *
 from tkinter import *
@@ -146,7 +148,7 @@ def nombreEstDansLaCase(event):
 # Fonction qui redirige vers la bonne fonction selon le mode sélectionné au moment
 # de l'appui sur un bouton de valeur
 def modeChecker(valeur):
-  if not partieTerminee.get():
+  if not partieTerminee.get() and not timeStop.get():
     if caseVide.get():
       valeurUtilisateur.set(valeur)
       verifierIndice() if modeIndice.get() else verifierEntree()
@@ -209,12 +211,15 @@ def verifierGrille():
     affichageValeurs()
     verificationPartieTerminee()
     if partieTerminee.get():
+      timeStop.set(True)
       boutonModeIndice.config(state = DISABLED)
       playGround.unbind('<Button-1>')
       playGround.delete('caseFocused')
-      global messageGagne
-      messageGagne = Label(indiceFrame, text = 'Gagné !')
-      messageGagne.pack(side = RIGHT)
+      nouvellePartie = messagebox.askyesno(title = 'Victoire', message = 'Nouvelle partie ?')
+      if nouvellePartie:
+        chargementGrilleAleatoire()
+      else:
+        mainWindow.quit()
 
 # Fonction pour vérifier si la partie est terminée
 def verificationPartieTerminee():
@@ -264,12 +269,10 @@ def switchMode():
 
 # Fonction qui charge une grille aléatoire
 def chargementGrilleAleatoire():
-  updateTimer()
+  timeStop.set(False)
   global grilleAleatoire
   listeGrillesRepertoire = []
   playGround.delete('caseFocused')
-  if partieTerminee.get():
-    messageGagne.destroy()
   for fichierGrille in glob.glob('*.txt'):
     listeGrillesRepertoire.append(fichierGrille)
   grilleAleatoire = random.choice(listeGrillesRepertoire)
@@ -330,6 +333,15 @@ def remplissageAutomatique():
         grilleDeJeu.setValeur(c, l, valeursPossiblesDansCase(c, l)[0])
         affichageValeurs()
         verifierGrille()
+
+# Fonction pour mettre en pause et masquer le canvas
+def switchPause():
+  timeStop.set(not timeStop.get())
+  if timeStop.get():
+    playGround.pack_forget()
+  else:
+    playGround.pack(side = TOP)
+    updateTimer()
 
 # Fonction pour mettre à jour le temps
 def updateTimer():
@@ -452,8 +464,13 @@ for i in range(1, tailleGrille + 1):
 boutonModeIndice = Checkbutton(indiceFrame, text = 'Mode indice', command = switchMode)
 boutonModeIndice.pack()
 
+# Bouton de pause du temps
+boutonPause = Checkbutton(indiceFrame, text = 'Pause', command = switchPause)
+boutonPause.pack(side = LEFT)
+
 # Affichage de la grille
 chargementGrilleAleatoire()
+updateTimer()
 
 # Affichage de la fenêtre principale,
 # et intrinsèquement des éléments graphiques la composant
