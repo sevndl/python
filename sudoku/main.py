@@ -14,6 +14,8 @@ import random
 
 # Fonction pour charger la grille depuis un fichier texte
 def chargerGrille(nomFichier, grilleARemplir):
+  minutes.set(0)
+  secondes.set(0)
   y = 1
   with open(nomFichier) as f:
     lignes = f.readlines()
@@ -23,6 +25,7 @@ def chargerGrille(nomFichier, grilleARemplir):
       grilleARemplir.setValeur(x, y, int(valeur))
       x += 1
     y += 1
+  updateTimer()
 
 # Fonction d'affichage de la grille
 # Ligne plus épaisse toutes les (multiples de la
@@ -279,31 +282,38 @@ def chargementGrilleAleatoire():
   boutonModeIndice.config(state = NORMAL)
   partieTerminee.set(False)
 
+# Fonction qui récupère les valeurs possibles dans une case
+def valeursPossiblesDansCase(colonne, ligne):
+  valeursLigne = []
+  valeursColonne = []
+  valeursCarre = []
+  valeursPossibles = []
+
+  # Récupération des valeurs uniquement positives de la colonne sélectionnée
+  for val in grilleVerifiee.getGrille()[colonne - 1]:
+    valeursColonne.append(val)
+  for val in valeursColonne:
+    if val <= 0:
+      valeursColonne.remove(val)
+
+  # Récupération des valeurs uniquement positives de la ligne sélectionnée
+  for x in range(1, tailleGrille + 1):
+    valeursLigne.append(grilleVerifiee.getValeur(x, ligne))
+  for val in valeursLigne:
+    if val <= 0:
+      valeursLigne.remove(val)
+
+  # Ajout des valeurs possibles => valeurs non présentes dans chacune des deux listes précédentes
+  for val in range(1, tailleGrille + 1):
+    if not val in valeursLigne and not val in valeursColonne:
+      valeursPossibles.append(val)
+
+  return valeursPossibles
+
 # Fonction qui cherche les valeurs possibles dans une case
-def valeursPossiblesDansCase():
+def affichageValeursPossiblesDansCase():
   if 'colonne' in globals() and 'ligne' in globals():
-    valeursLigne = []
-    valeursColonne = []
-    valeursCarre = []
-    valeursPossibles = []
-
-    for val in grilleVerifiee.getGrille()[colonne - 1]:
-      valeursColonne.append(val)
-    # Récupération des valeurs uniquement positives de la ligne
-    # et de la colonne de la case sélectionnée
-    for x in range(1, tailleGrille + 1):
-      valeursLigne.append(grilleVerifiee.getValeur(x, ligne))
-    for val in valeursColonne:
-      if val <= 0:
-        valeursColonne.remove(val)
-    for val in valeursLigne:
-      if val <= 0:
-        valeursLigne.remove(val)
-
-    for val in range(1, tailleGrille + 1):
-      if not val in valeursLigne and not val in valeursColonne:
-        valeursPossibles.append(val)
-
+    valeursPossibles = valeursPossiblesDansCase(colonne, ligne)
     if len(valeursPossibles) > 1:
       for value in valeursPossibles:
         affichageIndice(colonne, ligne, value, 'valeurpossible&' + str(colonne) + '&' + str(ligne) + '&' + str(value), 'valeurspossibles')
@@ -312,19 +322,28 @@ def valeursPossiblesDansCase():
       affichageValeurs()
       verifierGrille()
 
+# Fonction de remplissage automatique des cases avec une seule possibilité
+def remplissageAutomatique():
+  for c in range(1, tailleGrille + 1):
+    for l in range(1, tailleGrille + 1):
+      if len(valeursPossiblesDansCase(c, l)) == 1:
+        grilleDeJeu.setValeur(c, l, valeursPossiblesDansCase(c, l)[0])
+        affichageValeurs()
+        verifierGrille()
+
+# Fonction pour mettre à jour le temps
+def updateTimer():
+  secondes.set(secondes.get() + 1)
+  if secondes.get() >= 60:
+    minutes.set(minutes.get() + 1)
+    secondes.set(0)
+  timer.config(text = '{:d}:{:d}'.format(minutes.get(), secondes.get()))
+  if not timeStop.get():
+    mainWindow.after(1000, updateTimer)
+
 ########## CODE PRINCIPAL ##########
 
 # Déclaration des variables
-global grilleInitiale
-global grilleVerifiee
-global grilleDeJeu
-global tailleGrille
-global tailleCase
-global tailleCanvas
-global taillePoliceValeurs
-global taillePoliceIndices
-global hauteurMainWindow
-global largeurMainWindow
 grilleInitiale = Sudoku(9)
 grilleVerifiee = Sudoku(9)
 grilleDeJeu = Sudoku(9)
@@ -388,6 +407,9 @@ caseCliqueeY = IntVar()
 modeIndice = BooleanVar(False)
 caseVide = BooleanVar(False)
 partieTerminee = BooleanVar(False)
+secondes = IntVar()
+minutes = IntVar()
+timeStop = BooleanVar(False)
 
 # Mise en place de la barre de menus
 barreDeMenus = tkinter.Menu(mainWindow)
@@ -401,15 +423,16 @@ menuFichier.add_command(label = 'Quitter', command = mainWindow.quit)
 
 optionsMenu = tkinter.Menu(mainWindow)
 optionsMenu.add_command(label = 'Vérifier la grille', command = verifierGrille)
-optionsMenu.add_command(label = 'Afficher les valeurs possibles dans la case sélectionnée', command = lambda: valeursPossiblesDansCase())
+optionsMenu.add_command(label = 'Afficher les valeurs possibles dans la case sélectionnée', command = lambda: affichageValeursPossiblesDansCase())
+optionsMenu.add_command(label = 'Remplir les cases avec une seule possibilité', command = lambda: remplissageAutomatique())
 
 barreDeMenus.add_cascade(label = 'Fichier', menu = menuFichier)
 barreDeMenus.add_cascade(label = 'Options', menu = optionsMenu)
 mainWindow.config(menu = barreDeMenus)
 
 # Remplissage du header
-titre = Label(headerFrame, text = 'SUDOKU')
-titre.pack(side = TOP)
+timer = Label(headerFrame, text = '0:0')
+timer.pack(side = TOP)
 
 # Canvas du plateau de jeu
 playGround = Canvas(
