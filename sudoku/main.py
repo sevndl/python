@@ -25,7 +25,6 @@ def chargerGrille(nomFichier, grilleARemplir):
       grilleARemplir.setValeur(x, y, int(valeur))
       x += 1
     y += 1
-  updateTimer()
 
 # Fonction d'affichage de la grille
 # Ligne plus épaisse toutes les (multiples de la
@@ -265,6 +264,7 @@ def switchMode():
 
 # Fonction qui charge une grille aléatoire
 def chargementGrilleAleatoire():
+  updateTimer()
   global grilleAleatoire
   listeGrillesRepertoire = []
   playGround.delete('caseFocused')
@@ -404,11 +404,11 @@ indiceFrame.pack(side = LEFT)
 valeurUtilisateur = StringVar()
 caseCliqueeX = IntVar()
 caseCliqueeY = IntVar()
+secondes = IntVar()
+minutes = IntVar()
 modeIndice = BooleanVar(False)
 caseVide = BooleanVar(False)
 partieTerminee = BooleanVar(False)
-secondes = IntVar()
-minutes = IntVar()
 timeStop = BooleanVar(False)
 
 # Mise en place de la barre de menus
@@ -432,7 +432,7 @@ mainWindow.config(menu = barreDeMenus)
 
 # Remplissage du header
 timer = Label(headerFrame, text = '0:0')
-timer.pack(side = TOP)
+timer.pack(side = LEFT)
 
 # Canvas du plateau de jeu
 playGround = Canvas(
