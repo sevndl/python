@@ -32,8 +32,8 @@ def chargerGrille(nomFichier, grilleARemplir):
 # Ligne plus épaisse toutes les (multiples de la
 # racine carrée de la taille de la grille) cases
 def affichageGrille():
-  # Lignes verticales
   for x in range(0, tailleGrille + 1):
+    # Lignes verticales
     playGround.create_line(
       (x * tailleCase) + 4,
       4,
@@ -41,14 +41,13 @@ def affichageGrille():
       (tailleGrille * tailleCase) + 4,
       width = 2 if (x % math.sqrt(tailleGrille) == 0) else 1
     )
-  # Lignes horizontales
-  for y in range(0, tailleGrille + 1):
+    # Lignes horizontales
     playGround.create_line(
       4,
-      (y * tailleCase) + 4,
+      (x * tailleCase) + 4,
       (tailleGrille * tailleCase) + 4,
-      (y * tailleCase) + 4,
-      width = 2 if (y % math.sqrt(tailleGrille) == 0) else 1
+      (x * tailleCase) + 4,
+      width = 2 if (x % math.sqrt(tailleGrille) == 0) else 1
     )
 
 def getColonne(x):
