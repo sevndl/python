@@ -77,6 +77,7 @@ def affichageValeurs():
             etat = 'incorrect'
         for i in range(1, tailleGrille + 1):
           playGround.delete('indice&' + str(x) + '&' + str(y) + '&' + str(i))
+          playGround.delete('valeurpossible&' + str(x) + '&' + str(y) + '&' + str(i))
         playGround.create_text(
           ((x * tailleCase) - (tailleCase / 2)) + 4,
           ((y * tailleCase) - (tailleCase / 2)) + 4,
@@ -89,7 +90,10 @@ def affichageValeurs():
         playGround.delete('valeur&' + str(x) + '&' + str(y))
 
 # Fonction pour afficher les indices
-def affichageIndice(colonne, ligne, valeur, tag):
+def affichageIndice(colonne, ligne, valeur, tag, mode = 'indice'):
+  playGround.delete('valeur&' + str(colonne), '&' + str(ligne))
+  grilleDeJeu.removeValeur(colonne, ligne)
+  affichageValeurs()
   portionCase = tailleCase // math.sqrt(tailleGrille)
   if valeur % math.sqrt(tailleGrille) == 0:
     niveauColonne = math.sqrt(tailleGrille)
@@ -104,7 +108,7 @@ def affichageIndice(colonne, ligne, valeur, tag):
     ligne + 2,
     text = valeur,
     tag = tag,
-    fill = 'grey',
+    fill = 'grey' if mode == 'indice' else 'orange',
     font = Font(size = int(taillePoliceIndices), weight = 'normal'),
   )
 
@@ -115,7 +119,9 @@ def inverserValeur(valeur):
 def nombreEstDansLaCase(event):
   caseCliqueeX.set(event.x)
   caseCliqueeY.set(event.y)
+  global colonne
   colonne = getColonne(caseCliqueeX.get())
+  global ligne
   ligne = getColonne(caseCliqueeY.get())
 
   if grilleVerifiee.getValeur(colonne, ligne) <= 0:
@@ -136,7 +142,7 @@ def nombreEstDansLaCase(event):
     caseVide.set(False)
 
 # Fonction qui redirige vers la bonne fonction selon le mode sélectionné au moment
-# de l'appui sur la touche Entrer
+# de l'appui sur un bouton de valeur
 def modeChecker(valeur):
   if not partieTerminee.get():
     if caseVide.get():
@@ -145,14 +151,13 @@ def modeChecker(valeur):
 
 # Fonction pour vérifier l'indice entré
 def verifierIndice():
-  colonne = getColonne(caseCliqueeX.get())
-  ligne = getLigne(caseCliqueeY.get())
   valeurAValider = int(valeurUtilisateur.get())
   playGround.delete('valeur&' + str(colonne) + '&' + str(ligne))
+  playGround.delete('valeurpossible&' + str(colonne) + '&' + str(ligne))
   grilleDeJeu.removeValeur(colonne, ligne)
   tagPrefix = 'indice&'
-  tagIndice = (tagPrefix + str(colonne) + '&' + str(ligne) + '&' + str(valeurAValider))
-  tags = playGround.gettags(tagPrefix + str(colonne) + '&' + str(ligne) + '&' + str(valeurAValider))
+  tagIndice = tagPrefix + str(colonne) + '&' + str(ligne) + '&' + str(valeurAValider)
+  tags = playGround.gettags(tagIndice)
   indiceSupprime = False
   if len(tags) > 0:
     for tag in tags:
@@ -167,21 +172,20 @@ def verifierIndice():
 
 # Fonction pour valider l'entrée de l'utilisateur à chaque case remplie
 def verifierEntree():
-  colonne = getColonne(caseCliqueeX.get())
-  ligne = getLigne(caseCliqueeY.get())
-  if valeurUtilisateur.get() == '':
-    playGround.delete('valeur&' + str(colonne) + '&' + str(ligne))
-    grilleDeJeu.removeValeur(colonne, ligne)
   valeurAValider = int(valeurUtilisateur.get())
   if 1 <= valeurAValider <= tailleGrille:
-    grilleDeJeu.setValeur(colonne, ligne, valeurAValider)
-    tagPrefix = 'valeur&'
-    tagValeur = (tagPrefix + str(colonne) + '&' + str(ligne), 'nonVerifie')
-    # Attribution du tag
-    playGround.itemconfig(
-      tagPrefix + str(colonne) + '&' + str(ligne),
-      tag = tagValeur
-    )
+    if valeurAValider == grilleDeJeu.getValeur(colonne, ligne):
+      playGround.delete('valeur&' + str(colonne) + '&' + str(ligne))
+      grilleDeJeu.removeValeur(colonne, ligne)
+    else:
+      grilleDeJeu.setValeur(colonne, ligne, valeurAValider)
+      tagPrefix = 'valeur&'
+      tagValeur = (tagPrefix + str(colonne) + '&' + str(ligne), 'nonVerifie')
+      # Attribution du tag
+      playGround.itemconfig(
+        tagPrefix + str(colonne) + '&' + str(ligne),
+        tag = tagValeur
+      )
     affichageValeurs()
 
 # Fonction pour vérifier si la valeur de chaque case remplie est correcte
@@ -260,6 +264,7 @@ def switchMode():
 def chargementGrilleAleatoire():
   global grilleAleatoire
   listeGrillesRepertoire = []
+  playGround.delete('caseFocused')
   if partieTerminee.get():
     messageGagne.destroy()
   for fichierGrille in glob.glob('*.txt'):
@@ -275,28 +280,51 @@ def chargementGrilleAleatoire():
   partieTerminee.set(False)
 
 # Fonction qui cherche les valeurs possibles dans une case
-def valeursPossiblesDansCase(colonne, ligne):
-  valeursLigne = []
-  valeursColonne = grilleDeJeu.getGrille()[colonne - 1]
-  valeursCarre = []
-  valeursPossibles = []
+def valeursPossiblesDansCase():
+  if 'colonne' in globals() and 'ligne' in globals():
+    valeursLigne = []
+    valeursColonne = []
+    valeursCarre = []
+    valeursPossibles = []
 
-  for x in range(1, tailleGrille + 1):
-    valeursLigne.append(grilleDeJeu.getValeur(x, ligne))
+    for val in grilleVerifiee.getGrille()[colonne - 1]:
+      valeursColonne.append(val)
+    # Récupération des valeurs uniquement positives de la ligne
+    # et de la colonne de la case sélectionnée
+    for x in range(1, tailleGrille + 1):
+      valeursLigne.append(grilleVerifiee.getValeur(x, ligne))
+    for val in valeursColonne:
+      if val <= 0:
+        valeursColonne.remove(val)
+    for val in valeursLigne:
+      if val <= 0:
+        valeursLigne.remove(val)
 
-  # for val in valeursColonne:
-  #   if val <= 0:
-  #     valeursColonne.pop(val)
-  # for val in valeursLigne:
-  #   if val <= 0:
-  #     valeursLigne.pop(val)
+    for val in range(1, tailleGrille + 1):
+      if not val in valeursLigne and not val in valeursColonne:
+        valeursPossibles.append(val)
 
-  # print(valeursColonne)
-  # print(valeursLigne)
+    if len(valeursPossibles) > 1:
+      for value in valeursPossibles:
+        affichageIndice(colonne, ligne, value, 'valeurpossible&' + str(colonne) + '&' + str(ligne) + '&' + str(value), 'valeurspossibles')
+    else:
+      grilleDeJeu.setValeur(colonne, ligne, valeursPossibles[0])
+      affichageValeurs()
+      verifierGrille()
 
 ########## CODE PRINCIPAL ##########
 
 # Déclaration des variables
+global grilleInitiale
+global grilleVerifiee
+global grilleDeJeu
+global tailleGrille
+global tailleCase
+global tailleCanvas
+global taillePoliceValeurs
+global taillePoliceIndices
+global hauteurMainWindow
+global largeurMainWindow
 grilleInitiale = Sudoku(9)
 grilleVerifiee = Sudoku(9)
 grilleDeJeu = Sudoku(9)
@@ -373,6 +401,7 @@ menuFichier.add_command(label = 'Quitter', command = mainWindow.quit)
 
 optionsMenu = tkinter.Menu(mainWindow)
 optionsMenu.add_command(label = 'Vérifier la grille', command = verifierGrille)
+optionsMenu.add_command(label = 'Afficher les valeurs possibles dans la case sélectionnée', command = lambda: valeursPossiblesDansCase())
 
 barreDeMenus.add_cascade(label = 'Fichier', menu = menuFichier)
 barreDeMenus.add_cascade(label = 'Options', menu = optionsMenu)
