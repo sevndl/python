@@ -209,17 +209,7 @@ def verifierGrille():
           else:
             playGround.itemconfig('valeur&' + str(x) + '&' + str(y), tag = ('valeur&' + str(x) + '&' + str(y), 'incorrect'))
     affichageValeurs()
-    verificationPartieTerminee()
-    if partieTerminee.get():
-      timeStop.set(True)
-      boutonModeIndice.config(state = DISABLED)
-      playGround.unbind('<Button-1>')
-      playGround.delete('caseFocused')
-      nouvellePartie = messagebox.askyesno(title = 'Victoire', message = 'Nouvelle partie ?')
-      if nouvellePartie:
-        chargementGrilleAleatoire()
-      else:
-        mainWindow.quit()
+    playGround.after(500, verificationPartieTerminee)
 
 # Fonction pour vérifier si la partie est terminée
 def verificationPartieTerminee():
@@ -230,6 +220,16 @@ def verificationPartieTerminee():
       if valeurCaseCourante <= 0:
         casesRestantes += 1
   partieTerminee.set(True if casesRestantes == 0 else False)
+  if partieTerminee.get():
+    timeStop.set(True)
+    boutonModeIndice.config(state = DISABLED)
+    playGround.unbind('<Button-1>')
+    playGround.delete('caseFocused')
+    nouvellePartie = messagebox.askyesno(title = 'Victoire', message = 'Nouvelle partie ? \n(Yes : démarrer une nouvelle partie | No : quitter)')
+    if nouvellePartie:
+      chargementGrilleAleatoire()
+    else:
+      mainWindow.quit()
 
 # Fonction pour sauvegarder la partie dans un fichier .txt
 def sauvegarderPartie():
