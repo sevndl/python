@@ -175,19 +175,24 @@ def verifierIndice():
   mainWindow.focus_set()
 
 # Fonction pour valider l'entrée de l'utilisateur à chaque case remplie
-def verifierEntree():
-  valeurAValider = int(valeurUtilisateur.get())
+def verifierEntree(c = 0, l = 0, valeurAValider = 0):
+  if valeurAValider == 0:
+    valeurAValider = int(valeurUtilisateur.get())
+  if c == 0:
+    c = colonne
+  if l == 0:
+    l = ligne
   if 1 <= valeurAValider <= tailleGrille:
-    if valeurAValider == grilleDeJeu.getValeur(colonne, ligne):
-      playGround.delete('valeur&' + str(colonne) + '&' + str(ligne))
-      grilleDeJeu.removeValeur(colonne, ligne)
+    if valeurAValider == grilleDeJeu.getValeur(c, l):
+      playGround.delete('valeur&' + str(c) + '&' + str(l))
+      grilleDeJeu.removeValeur(c, l)
     else:
-      grilleDeJeu.setValeur(colonne, ligne, valeurAValider)
+      grilleDeJeu.setValeur(c, l, valeurAValider)
       tagPrefix = 'valeur&'
-      tagValeur = (tagPrefix + str(colonne) + '&' + str(ligne), 'nonVerifie')
+      tagValeur = (tagPrefix + str(c) + '&' + str(l), 'nonVerifie')
       # Attribution du tag
       playGround.itemconfig(
-        tagPrefix + str(colonne) + '&' + str(ligne),
+        tagPrefix + str(c) + '&' + str(l),
         tag = tagValeur
       )
     affichageValeurs()
@@ -225,7 +230,7 @@ def verificationPartieTerminee():
     boutonModeIndice.config(state = DISABLED)
     playGround.unbind('<Button-1>')
     playGround.delete('caseFocused')
-    nouvellePartie = messagebox.askyesno(title = 'Victoire', message = 'Nouvelle partie ? \n(Yes : démarrer une nouvelle partie | No : quitter)')
+    nouvellePartie = messagebox.askyesno(title = 'Victoire en ' + str(minutes.get()) + 'minute(s) et ' + str(secondes.get()) + 'seconde(s).', message = 'Nouvelle partie ? \n(Yes : démarrer une nouvelle partie | No : quitter)')
     if nouvellePartie:
       chargementGrilleAleatoire()
     else:
@@ -313,7 +318,7 @@ def valeursPossiblesDansCase(colonne, ligne):
 
   return valeursPossibles
 
-# Fonction qui cherche les valeurs possibles dans une case
+# Fonction qui affiche les valeurs possibles dans une case
 def affichageValeursPossiblesDansCase():
   if 'colonne' in globals() and 'ligne' in globals():
     valeursPossibles = valeursPossiblesDansCase(colonne, ligne)
@@ -330,9 +335,9 @@ def remplissageAutomatique():
   for c in range(1, tailleGrille + 1):
     for l in range(1, tailleGrille + 1):
       if len(valeursPossiblesDansCase(c, l)) == 1:
-        grilleDeJeu.setValeur(c, l, valeursPossiblesDansCase(c, l)[0])
-        affichageValeurs()
-        verifierGrille()
+        verifierEntree(c, l, valeursPossiblesDansCase(c, l)[0])
+  affichageValeurs()
+  verifierGrille()
 
 # Fonction pour mettre en pause et masquer le canvas
 def switchPause():
